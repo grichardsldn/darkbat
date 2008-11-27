@@ -1,0 +1,4 @@
+x split dns.cpp into .cpp and .h
+
+x create main.cpp that sits on a socket and trys to decode
+  what comes into port 53.
