@@ -1,3 +1,5 @@
+#include <netinet/in.h>
+
 class UDPSocket
 {
 	public: 

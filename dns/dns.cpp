@@ -2,21 +2,8 @@
 #include <assert.h>
 #include <string.h>
 #include <netinet/in.h>
+#include "dns.h"
 
-
-class DNSQuestion
-{
-	public:
-	char qname[1024];
-	unsigned short qtype;
-	unsigned short qclass;
-
-	public:
-	char *Pack( char *data, int buffer_length );
-	char *UnPack( char *data, int length );
-	void Tell();
-	DNSQuestion();
-};
 
 DNSQuestion::DNSQuestion()
 {
@@ -40,8 +27,20 @@ char *DNSQuestion::UnPack( char *data, int length )
 	assert( data );
 	assert( length >= 5 );
 
-	strncpy( qname, data, length );
-
+	while ( *cp != 0 )
+	{
+		int len = *cp++;
+		printf("len=#%d", len );
+		for( int i  = 0 ; i <len ; i++)
+		{
+			sprintf(qname, "%s%c", qname, *cp++);
+		}
+		sprintf(qname, "%s.", qname );
+	}			
+	cp ++;		
+		
+	printf("read qname, its \"%s\"\n", qname );
+	printf("strlen is #%d\n", strlen(qname));
 	cp += strlen( qname );
 	
 	unsigned short *wp = (unsigned short *)cp;
@@ -52,25 +51,6 @@ char *DNSQuestion::UnPack( char *data, int length )
 	return cp;
 }
 	
-
-
-class DNSRR
-{
-	public:
-	char name[1024]; 
-	unsigned short type;
-	unsigned short rr_class;
-	unsigned int ttl;
-	int rd_length;
-	char rdata[1024]; 
-
-	public:
-	char *Pack( char *data, int buffer_length );
-	char *UnPack( char *data, int length );
-	void Tell();
-	DNSRR();
-};
-
 DNSRR::DNSRR()
 {
 	strcpy(name, "");
@@ -121,27 +101,6 @@ char *DNSRR::UnPack( char *data, int length )
 	
 
 
-class DNSHeader
-{
-	public:
-	unsigned short id;
-	bool qr;  // 0=query, 1=response
-	char opcode;
-	bool aa;  // authorative answer
-	bool tc;  // truncation
-	bool rd;  // recursion desired
-	bool ra;  // recursion available
-	char z;  // reserved
-	char rcode;   // reponse code
-	int qdcount;
-	int ancount;
-	int nscount;
-	int arcount;
-
-	char *UnPack( char *data, int length );
-	DNSHeader();
-};
-
 DNSHeader::DNSHeader()
 {
 	id = 0xffff;	
@@ -181,29 +140,6 @@ char *DNSHeader::UnPack( char *data, int length)
 	return (char *)wp;
 }
 		
-class DNSMessage
-{
-	public:
-	DNSHeader header;
-	
-	DNSQuestion qds[10];
-	DNSRR ans[10];
-	DNSRR nss[10];
-	DNSRR ars[10];
-
-	public:
-	/*
-	void add_qd( DNSQuestion *question );
-	void add_an( DNSRR *answer );
-	void add_ns( DNSRR *nameserver );
-	void add_ar( DNSRR *ar);
-	*/
-
-	char *Pack( char *data, int buffer_length );
-	char *UnPack( char *data, int length );
-	void Tell();
-};
-
 
 char *DNSMessage::UnPack( char *data, int length )
 {
@@ -235,6 +171,3 @@ void DNSMessage::Tell()
 
 
 
-main()
-{
-}

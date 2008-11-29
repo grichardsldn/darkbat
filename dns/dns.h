@@ -1,10 +1,10 @@
-
+#include <netinet/in.h>
 
 
 class DNSQuestion
 {
 	public:
-	char *qname;
+	char qname[1024];
 	unsigned short qtype;
 	unsigned short qclass;
 
@@ -12,23 +12,27 @@ class DNSQuestion
 	char *Pack( char *data, int buffer_length );
 	char *UnPack( char *data, int length );
 	void Tell();
+	DNSQuestion();
 };
+
 
 class DNSRR
 {
 	public:
-	char *name; 
+	char name[1024]; 
 	unsigned short type;
-	unsigned short class;
+	unsigned short rr_class;
 	unsigned int ttl;
 	int rd_length;
-	char *rdata;
+	char rdata[1024]; 
 
 	public:
 	char *Pack( char *data, int buffer_length );
 	char *UnPack( char *data, int length );
 	void Tell();
+	DNSRR();
 };
+
 
 class DNSHeader
 {
@@ -47,20 +51,32 @@ class DNSHeader
 	int nscount;
 	int arcount;
 
-	DNSQuestion *qd_head;
-	DNSRR *an_head;
-	DNSRR *ns_head;
-	DNSRR *ar_head );
+	char *UnPack( char *data, int length );
+	DNSHeader();
+};
+
+class DNSMessage
+{
+	public:
+	DNSHeader header;
+	
+	DNSQuestion qds[10];
+	DNSRR ans[10];
+	DNSRR nss[10];
+	DNSRR ars[10];
 
 	public:
+	/*
 	void add_qd( DNSQuestion *question );
 	void add_an( DNSRR *answer );
 	void add_ns( DNSRR *nameserver );
 	void add_ar( DNSRR *ar);
+	*/
 
 	char *Pack( char *data, int buffer_length );
 	char *UnPack( char *data, int length );
 	void Tell();
 };
+
 
 

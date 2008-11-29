@@ -1,4 +1,4 @@
-OBJECTS=UDPSocket.o dns.o
+OBJECTS=UDPSocket.o dns.o main.o
 
 CFLAGS=-g
 
