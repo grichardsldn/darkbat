@@ -19,6 +19,7 @@ int y );
 
 	void Run( int x, int y, int argc, char **argv);
 	void Quit();
+	virtual void Tick();
 
 	void SetColour( char *name );
 	void DrawLine( int x1, int y1, int x2, int y2 );

@@ -4,7 +4,12 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
+#include <unistd.h>
 #include "window.h"
+
+void GWindow::Tick()
+{
+}
 
 GWindow::GWindow( )
 {
@@ -113,6 +118,9 @@ void GWindow::Run( int x, int y, int argc, char **argv)
        */
       while ( quit_posted != True )
 	 {
+
+	while( XPending(display) )
+{
 
           /*
            * Fetch an X Event :
@@ -224,6 +232,9 @@ void GWindow::Run( int x, int y, int argc, char **argv)
 
 		break;
          }
+	}
+	usleep(10000);
+	Tick();
 	}
 
 	// end of event loop

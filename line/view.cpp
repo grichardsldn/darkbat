@@ -18,6 +18,13 @@ View::View( Model *a_model )
 	model = a_model;
 }
 
+void View::Tick()
+{
+	viewpoint.x -= 0.01;
+	screenpoint.x -= 0.01;
+	Draw();
+}
+
 void View::Press( int x, int y)
 {
 	printf("Moving viewpoint\n");

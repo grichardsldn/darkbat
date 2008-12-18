@@ -8,6 +8,7 @@ class View : public GWindow
 	// GWindow stuff:
 	void Draw();
 	void Press( int x, int y);
+	void Tick();
 	
 
 	// View stuff
