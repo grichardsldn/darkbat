@@ -27,6 +27,7 @@ class Model
 	void AddPoint( float x, float y, float z, int ref );
 	void AddLine( Line line, int ref );
 	void AddLine( float x1, float y1, float z1, float x2, float y2, float z2, int ref);
+	void Remove( int ref );
 
 	Object objects[NUM_OBJECTS];
 };

@@ -14,6 +14,20 @@ Model::Model()
 	}
 }
 
+void Model::Remove( int ref )
+{
+	int i;
+	for( i = 0 ; i < NUM_OBJECTS ; i++)
+	{
+		if( objects[i].allocated )
+		{
+			//BBB check the reference and delete	
+		objects[i].allocated = false;
+		}
+	}
+}
+
+
 void Model::AddPoint( float x, float y, float z, int ref )
 {
 	Point a;
