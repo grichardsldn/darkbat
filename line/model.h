@@ -15,6 +15,7 @@ class Object
 	Point point_b;
 	Point point_c;
 	int ref;
+	int expires;
 };
 
 class Model
@@ -23,13 +24,17 @@ class Model
 
 	Model();
 
-	void AddPoint( Point point, int ref );
-	void AddPoint( float x, float y, float z, int ref );
-	void AddLine( Line line, int ref );
-	void AddLine( float x1, float y1, float z1, float x2, float y2, float z2, int ref);
+	void AddPoint( Point point, int ref, int lifetime );
+	void AddPoint( float x, float y, float z, int ref, int lifetime );
+	void AddLine( Line line, int ref, int lifetime );
+	void AddLine( float x1, float y1, float z1, float x2, float y2, float z2, int ref, int lifetime);
 	void Remove( int ref );
 
 	Object objects[NUM_OBJECTS];
+	void Clock();
+
+	private:
+	int frame;
 };
 	
 	

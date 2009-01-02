@@ -9,7 +9,7 @@ class View : public GWindow
 	void Draw();
 	void Press( int x, int y);
 	void Tick();
-	
+	void Key( int key );	
 
 	// View stuff
 

@@ -161,7 +161,7 @@ void Slope2d::Set( Point2d start, Point2d finish )
 		else
 		{
 			printf("dx1=%f:\n", dx1 );
-			assert( 0 );
+			//assert( 0 );
 		}
 	}
 }

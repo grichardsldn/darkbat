@@ -18,11 +18,36 @@ View::View( Model *a_model )
 	model = a_model;
 }
 
+void View::Key( int key )
+{
+	switch (key)
+	{
+		case 'j':
+		viewpoint.x -= 1.0;
+		screenpoint.x -= 1.0;
+		break;
+		case 'k':
+		viewpoint.x += 1.0;
+		screenpoint.x += 1.0;
+		break;
+		case 'h':
+		viewpoint.z += 1.0;
+		screenpoint.z += 1.0;
+		break;
+		case 'l':
+		viewpoint.z -= 1.0;
+		screenpoint.z -= 1.0;
+		break;
+	}
+}
+
 void View::Tick()
 {
-	viewpoint.x -= 0.01;
-	screenpoint.x -= 0.01;
+	viewpoint.x -= 0.05;
+	screenpoint.x -= 0.05;
 	Draw();
+	model->Clock();
+	
 }
 
 void View::Press( int x, int y)
