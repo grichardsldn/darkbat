@@ -89,7 +89,7 @@ void recv_pkt( char *bp )
 				(float)( y2 + pos_y),
 				(float)( z2 + pos_z),
 				ref +connection_ref,
-				50 );
+				100 );
 	
 		break;
 
