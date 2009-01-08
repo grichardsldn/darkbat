@@ -162,10 +162,11 @@ void dkbObj::removeShape( int ref )
 
 void dkbObj::project( dkbBlock block, dkbPos pos )
 {
-	pthread_create( &run_thread, NULL, start, this);
-
 	socket = new UDPSocket();
 	socket->SetTarget(0x7f000001, 1234);
+
+	pthread_create( &run_thread, NULL, start, this);
+
 }
 
 void dkbObj::moveRel( dkbPos offset )
