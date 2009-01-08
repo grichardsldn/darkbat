@@ -59,6 +59,7 @@ class dkbObj
 	void Start();
 	
 	private:
+	void Xmit();
 	dkbShapeEntry *shapes[10];
 	dkbPos position;
 	pthread_t run_thread;

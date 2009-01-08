@@ -186,11 +186,10 @@ void *dkbObj::start( void * a_this)
 	return NULL;
 }
 
-void dkbObj::Start()
+void dkbObj::Xmit()
 {
-	char buffer[1024];
-	while ( 1)
-	{
+	char buffer[1500];
+
 	char *bp = &buffer[0];
 
 	// write the magic number and the reference number
@@ -222,9 +221,16 @@ void dkbObj::Start()
 			
 		}
 	}
-		bp = writeInt( bp, DKB_END );
+	bp = writeInt( bp, DKB_END );
 
-		socket->Send( &buffer[0], (int)(bp - &buffer[0]) );
+	socket->Send( &buffer[0], (int)(bp - &buffer[0]) );
+}
+
+void dkbObj::Start()
+{
+	while ( 1)
+	{
+		Xmit();
 		sleep(1);
 	}
 }
