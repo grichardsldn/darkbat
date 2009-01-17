@@ -8,4 +8,5 @@
 
 #define DKB_ELEMENT_LINE (64)
 #define DKB_ELEMENT_POINT (65)
+#define DKB_ELEMENT_CLICKTRI (66)
 

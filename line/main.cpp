@@ -67,7 +67,44 @@ void recv_pkt( char *bp )
 			pos_z = readInt( bp, &bp);		
 		break;
 
+		case DKB_ELEMENT_CLICKTRI:
+		{
+			int x1, y1, z1;
+			int x2, y2, z2;
+			int x3, y3, z3;
+			int col; // not written into model
+			int clickref; // ignore at the moment
+		
+			x1 = readInt( bp, &bp);	
+			y1 = readInt( bp, &bp);	
+			z1 = readInt( bp, &bp);	
+			x2 = readInt( bp, &bp);	
+			y2 = readInt( bp, &bp);	
+			z2 = readInt( bp, &bp);	
+			x3 = readInt( bp, &bp);	
+			y3 = readInt( bp, &bp);	
+			z3 = readInt( bp, &bp);	
+			col = readInt( bp, &bp );
+			clickref= readInt( bp, &bp);
+
+			printf("GDR: AddTri %d %d %d %d %d %d %d %d %d\n",
+				x1,y1,z1,x2,y2,z2,x3,y3,z3);	
+			model.AddClickTri( (float)(x1 + pos_x),
+				(float)( y1 + pos_y),
+				(float)( z1 + pos_z),
+				(float)( x2 + pos_x),
+				(float)( y2 + pos_y),
+				(float)( z2 + pos_z),
+				(float)( x3 + pos_x),
+				(float)( y3 + pos_y),
+				(float)( z3 + pos_z),
+				ref +connection_ref,
+				50 );
+		}	
+		break;
+
 		case DKB_ELEMENT_LINE:
+		{
 			int x1, y1, z1;
 			int x2, y2, z2;
 			int col; // not written into model
@@ -90,7 +127,7 @@ void recv_pkt( char *bp )
 				(float)( z2 + pos_z),
 				ref +connection_ref,
 				100 );
-	
+		}
 		break;
 
 		case DKB_END:
