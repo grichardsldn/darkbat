@@ -11,6 +11,7 @@
 #define ELEMENT_LINE (1)
 #define ELEMENT_POINT ( 2)
 #define ELEMENT_FLATRECT (3)
+#define ELEMENT_CLICKTRI (4)
 
 char *writeInt( char *buf, int val)
 {
@@ -49,8 +50,13 @@ class dkbElement
 	int x2;
 	int y2;
 	int z2;
+	int x3;
+	int y3;
+	int z3;
 	int col;
 	int type;
+	dkbClickReceiver *receiver;
+	int clickref;
 
 	dkbElement* next;
 
@@ -63,6 +69,25 @@ char *dkbElement::write( char *buf )
 {
 	switch( type )
 	{
+		case ELEMENT_CLICKTRI:
+		{
+			buf = writeInt( buf, DKB_ELEMENT_CLICKTRI );
+
+			// x1, y1, z1, x2, y2, z2, col 
+			buf = writeInt( buf, x1 );
+			buf = writeInt( buf, y1 );
+			buf = writeInt( buf, z1 );
+			buf = writeInt( buf, x2 );
+			buf = writeInt( buf, y2 );
+			buf = writeInt( buf, z2 );
+			buf = writeInt( buf, x3 );
+			buf = writeInt( buf, y3 );
+			buf = writeInt( buf, z3 );
+			buf = writeInt( buf, col );
+			buf = writeInt( buf, clickref );
+		}
+		break;
+
 		case ELEMENT_LINE:
 		{
 			buf = writeInt( buf, DKB_ELEMENT_LINE );
@@ -76,6 +101,7 @@ char *dkbElement::write( char *buf )
 			buf = writeInt( buf, z2 );
 			buf = writeInt( buf, col );
 		} 
+		break;
 	}
 }
 
@@ -83,6 +109,7 @@ dkbElement::dkbElement()
 {
 	type = ELEMENT_NONE;
 	next = NULL;
+	receiver = NULL;
 }
 
 void dkbShape::addElement( dkbElement *element )
@@ -90,6 +117,31 @@ void dkbShape::addElement( dkbElement *element )
 	element->next = head;	
 	head = element;
 }
+
+void dkbShape::addClickTriangle( int an_x1, int a_y1, int a_z1,
+				int an_x2, int a_y2, int a_z2,
+				int an_x3, int a_y3, int a_z3,
+				int a_col,
+				dkbClickReceiver *a_callback,
+				int a_clickref )
+{
+	dkbElement *e = new dkbElement();
+	e->type = ELEMENT_CLICKTRI;
+	e->x1 = an_x1;	
+	e->y1 = a_y1;
+	e->z1 = a_z1;
+	e->x2 = an_x2;
+	e->y2 = a_y2;
+	e->z2 = a_z2;
+	e->x3 = an_x3;
+	e->y3 = a_y3;
+	e->z3 = a_z3;
+	e->col = a_col;
+	e->receiver = a_callback;
+	e->clickref = a_clickref;
+	addElement( e );
+}
+
 
 void dkbShape::addLine( int an_x1, int a_y1, int a_z1,
 			int an_x2, int a_y2, int a_z2,
@@ -125,6 +177,16 @@ dkbObj::dkbObj()
 	{
 		shapes[i] = new dkbShapeEntry();
 	}
+
+	projecting = false;
+}
+
+void dkbObj::Changed()
+{
+	if( projecting )
+	{
+		Xmit();
+	}
 }
 
 void dkbObj::addShape( dkbShape *shape, dkbAngle angle, dkbPos trans,
@@ -149,6 +211,8 @@ void dkbObj::addShape( dkbShape *shape, dkbAngle angle, dkbPos trans,
 	shapes[found]->position = trans;
 	shapes[found]->ref = ref;
 	shapes[found]->allocated = true;
+
+	Changed();
 }
 
 bool dkbObj::connect( dkbBlock block )
@@ -158,15 +222,27 @@ bool dkbObj::connect( dkbBlock block )
 
 void dkbObj::removeShape( int ref )
 {
+	int found = -1;
+	for (int i = 0 ; i < 10 ; i++)
+	{
+		if( shapes[i]->ref == ref)	
+		{
+			shapes[i]->allocated = false;
+		}
+	}
+	Changed();	
 }
 
 void dkbObj::project( dkbBlock block, dkbPos pos )
 {
-	socket = new UDPSocket();
-	socket->SetTarget(0x7f000001, 1234);
+	txrx_socket = new UDPSocket();
+	txrx_socket->Bind(0,0);
+	txrx_socket->SetTarget(0x7f000001, 1234);
 
-	pthread_create( &run_thread, NULL, start, this);
+	pthread_create( &send_thread, NULL, start_send_thread, this);
+	pthread_create( &receive_thread, NULL, start_receive_thread, this);
 
+	projecting = true;
 }
 
 void dkbObj::moveRel( dkbPos offset )
@@ -178,17 +254,44 @@ dkbShape::dkbShape()
 	head = NULL;
 }	
 
-void *dkbObj::start( void * a_this)
+void *dkbObj::start_receive_thread( void * a_this)
 {
 	dkbObj *obj = (dkbObj*) a_this;
-	obj->Start();
+	obj->StartReceiveThread();
 
 	return NULL;
 }
 
-void dkbObj::Xmit()
+void *dkbObj::start_send_thread( void * a_this)
+{
+	dkbObj *obj = (dkbObj*) a_this;
+	obj->StartSendThread();
+
+	return NULL;
+}
+
+void dkbObj::StartReceiveThread()
 {
 	char buffer[1500];
+	while(1)
+	{
+		txrx_socket->ReceiveFrom( &buffer[0], 1500, NULL, NULL );
+		printf("ReceiveThread: Received packet\n");
+	}
+}
+
+void dkbObj::StartSendThread()
+{
+	while( 1)
+	{
+		Xmit();
+		sleep(1);
+	}
+}
+
+void dkbObj::Xmit()
+{
+	char buffer[1024];
 
 	char *bp = &buffer[0];
 
@@ -221,18 +324,9 @@ void dkbObj::Xmit()
 			
 		}
 	}
-	bp = writeInt( bp, DKB_END );
+		bp = writeInt( bp, DKB_END );
 
-	socket->Send( &buffer[0], (int)(bp - &buffer[0]) );
-}
-
-void dkbObj::Start()
-{
-	while ( 1)
-	{
-		Xmit();
-		sleep(1);
-	}
+		txrx_socket->Send( &buffer[0], (int)(bp - &buffer[0]) );
 }
 
 main()
@@ -256,6 +350,10 @@ main()
 	cube.addLine( 1,0,1, 1,1,1, 0 );
 	cube.addLine( 0,0,1, 0,1,1, 0 );
 
+
+	dkbShape tri;
+	tri.addClickTriangle( 0,0,0, 1,1,1, 3,1,2, 0, NULL,0 );
+
 	dkbObj obj;
 	dkbPos pos;
 	pos.x = 0;
@@ -263,13 +361,19 @@ main()
 	pos.z = 0;
 	dkbAngle angle;
 	obj.addShape( &cube ,angle, pos,  0 );	
+	dkbBlock block;	
+	obj.project( block, pos );
+
+	usleep(300000);
 	pos.x = 0;
 	pos.y = 5;
 	pos.z = 0;
 	obj.addShape( &cube ,angle, pos,  1 );	
+	usleep(300000);
+	obj.addShape( &tri ,angle, pos,  2 );	
 
-	dkbBlock block;	
-	obj.project( block, pos );
-	
+
+	sleep(2);
+	obj.removeShape( 2 );	
 	sleep(10);
 }	
