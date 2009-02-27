@@ -67,19 +67,20 @@ void View::Press( int x, int y)
 	viewpoint.x -= 1.0;
 	screenpoint.x -= 1.0;
 	}
-	
 
-	Draw();
+
+	model->Locate( x, y );	
+	//Draw();
 }
 
 void View::MapPoint( Point p, int *x_out, int *y_out )
 {
-        printf("MapPoint: %f,%f,%f\n", p.x,p.y,p.z);
+        //printf("MapPoint: %f,%f,%f\n", p.x,p.y,p.z);
 
         float screen_x; // the final x position on the display
         float screen_y; // the final y position on the display
 
-        printf("X plane:\n");
+        //printf("X plane:\n");
 
         // start with the x display plane (looking down)
         Point2d a;
@@ -99,9 +100,9 @@ void View::MapPoint( Point p, int *x_out, int *y_out )
         b.y = screenpoint.z - 2.0;
         screen.Set( a,b );
 
-        printf("Line of sight:\n");
+        //printf("Line of sight:\n");
         los.Tell();
-        printf("Screen:\n");
+        //printf("Screen:\n");
         screen.Tell();
 
         Point2d ipoint;
@@ -110,18 +111,18 @@ void View::MapPoint( Point p, int *x_out, int *y_out )
 
         if( !intersects )
         {
-                printf("Doesnt intersect\n");
+                //printf("Doesnt intersect\n");
                 // Nothing to see
                 return;
         }
-        printf("intersects at %f %f\n", ipoint.x, ipoint.y );
+        //printf("intersects at %f %f\n", ipoint.x, ipoint.y );
 
         screen_x = ipoint.y - screenpoint.z;
 
-        printf("screen_x=%f\n", screen_x );
+        //printf("screen_x=%f\n", screen_x );
 
         // now do the y display plane
-        printf("Now doing y plane:\n");
+        //printf("Now doing y plane:\n");
         // using los and screen
         a.x = viewpoint.x;
         a.y = viewpoint.y;
@@ -136,23 +137,23 @@ void View::MapPoint( Point p, int *x_out, int *y_out )
 
         screen.Set( a,b );
 
-        printf("Line of sight:\n");
+        //printf("Line of sight:\n");
         los.Tell();
-        printf("Screen:\n");
+        ////printf("Screen:\n");
         screen.Tell();
         intersects = los.Intersects( &screen, &ipoint );
 
         if( !intersects )
         {
-                printf("Lines dont intersect in y.\n");
+                ////printf("Lines dont intersect in y.\n");
                 // Nothing to see
                 return;
         }
-        printf("Lines intersect in y: %f,%f\n", ipoint.x, ipoint.y);
+        ////printf("Lines intersect in y: %f,%f\n", ipoint.x, ipoint.y);
 
         screen_y = ipoint.y - screenpoint.y;
 
-        printf("screen_y =%f\n", screen_y);
+        //printf("screen_y =%f\n", screen_y);
         int x = (int) (screen_x * 100.0 );
         // x is now +-200 and backwards
         x = x+200;
@@ -166,7 +167,7 @@ void View::MapPoint( Point p, int *x_out, int *y_out )
 	*y_out = y;
 }
 
-void View::DrawPoint( Point p )
+void View::DrawPoint( Point &p )
 {
 /*
 	printf("DrawPoint: %f,%f,%f\n", p.x,p.y,p.z);
@@ -194,9 +195,9 @@ void View::DrawPoint( Point p )
 	b.y = screenpoint.z - 2.0;
 	screen.Set( a,b );
 
-	printf("Line of sight:\n");		
+	//printf("Line of sight:\n");		
 	los.Tell();
-	printf("Screen:\n");
+	//printf("Screen:\n");
 	screen.Tell();
 
 	Point2d ipoint;
@@ -205,18 +206,18 @@ void View::DrawPoint( Point p )
 
 	if( !intersects )
 	{
-		printf("Doesnt intersect\n");
+		//printf("Doesnt intersect\n");
 		// Nothing to see
 		return;
 	}
-	printf("intersects at %f %f\n", ipoint.x, ipoint.y );
+	//printf("intersects at %f %f\n", ipoint.x, ipoint.y );
 	
 	screen_x = ipoint.y - screenpoint.z;
 
-	printf("screen_x=%f\n", screen_x );	
+	//printf("screen_x=%f\n", screen_x );	
 
 	// now do the y display plane 
-	printf("Now doing y plane:\n");
+	//printf("Now doing y plane:\n");
 
 	// using los and screen
 	a.x = viewpoint.x;
@@ -232,23 +233,23 @@ void View::DrawPoint( Point p )
 
 	screen.Set( a,b );
 
-	printf("Line of sight:\n");		
+	//printf("Line of sight:\n");		
 	los.Tell();
-	printf("Screen:\n");
+	//printf("Screen:\n");
 	screen.Tell();
 	intersects = los.Intersects( &screen, &ipoint );	
 
 	if( !intersects )
 	{
-		printf("Lines dont intersect in y.\n");
+		//printf("Lines dont intersect in y.\n");
 		// Nothing to see
 		return;
 	}
-	printf("Lines intersect in y: %f,%f\n", ipoint.x, ipoint.y);
+	//printf("Lines intersect in y: %f,%f\n", ipoint.x, ipoint.y);
 
 	screen_y = ipoint.y - screenpoint.y;
 
-	printf("screen_y =%f\n", screen_y);
+	//printf("screen_y =%f\n", screen_y);
 	int x = (int) (screen_x * 100.0 );
 	// x is now +-200 and backwards
 	x = x+200;
@@ -265,15 +266,63 @@ void View::DrawPoint( Point p )
 
 	SetColour("linen");	
 	GWindow::DrawLine( x,y,x,y );
+
+	// record where it was rendered
+	p.rendered_x = x;	
+	p.rendered_y = y;
 }
 
+void View::DrawTriangle( Point &a, Point &b, Point &c,bool highlight )
+{
+	int x1,y1, x2,y2, x3,y3;
+	
+	MapPoint( a, &x1, &y1);
+	MapPoint( b, &x2, &y2);
+	MapPoint( c, &x3, &y3);
 
-void View::DrawLine( Point a, Point b )
+	a.rendered_x = x1;
+	a.rendered_y = y1;
+	b.rendered_x = x2;
+	b.rendered_y = y2;
+	c.rendered_x = x3;
+	c.rendered_y = y3;
+
+
+	if( highlight )
+	{
+		GWindow::SetColour("red");
+	}
+	else
+	{
+		GWindow::SetColour("white");
+	}
+
+	GWindow::DrawLine( x1,y1,x2,y2);
+	GWindow::DrawLine( x2,y2,x3,y3);
+	GWindow::DrawLine( x3,y3,x1,y1);
+}
+	
+
+void View::DrawLine( Point &a, Point &b, bool highlight )
 {
 	int x1,y1, x2,y2;
 	
 	MapPoint( a, &x1, &y1);
 	MapPoint( b, &x2, &y2);
+
+	a.rendered_x = x1;
+	a.rendered_y = y1;
+	b.rendered_x = x2;
+	b.rendered_y = y2;
+
+	if( highlight )
+	{
+		GWindow::SetColour("red");
+	}
+	else
+	{
+		GWindow::SetColour("white");
+	}
 
 	GWindow::DrawLine( x1,y1,x2,y2);
 }
@@ -292,9 +341,25 @@ void View::Draw()
 			{
 				DrawPoint( model->objects[i].point_a );
 			}
+			else if( model->objects[i].type == OBJECT_TRIANGLE )
+			{
+				bool highlight = false;
+				if (model->selected == &model->objects[i] )
+				{
+				
+					highlight = true;
+				}
+				DrawTriangle( model->objects[i].point_a, model->objects[i].point_b,  model->objects[i].point_c, highlight );
+			}
 			else if( model->objects[i].type == OBJECT_LINE )
 			{
-				DrawLine( model->objects[i].point_a, model->objects[i].point_b );
+				bool highlight = false;
+				if (model->selected == &model->objects[i] )
+				{
+				
+					highlight = true;
+				}
+				DrawLine( model->objects[i].point_a, model->objects[i].point_b, highlight );
 			}
 		}
 	}

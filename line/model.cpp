@@ -5,6 +5,40 @@
 #include "model.h"
 
 
+Object *Model::Locate( int x, int y )
+{
+	float shortest_dist = 10000.0;
+	Object *shortest_obj = NULL;
+
+	Point2d select_point;
+	select_point.x = (float)x;
+	select_point.y = (float)y;
+
+	Point2d test_point;
+	
+	for( int i = 0 ; i < NUM_OBJECTS ; i ++)
+	{
+		if(objects[i].allocated )
+		{
+			if( objects[i].type != OBJECT_TRIANGLE)
+			{
+				continue;
+			}
+			test_point.x = (float)objects[i].point_a.rendered_x;
+			test_point.y = (float)objects[i].point_a.rendered_y;
+
+			float dist = test_point.DistanceFrom( &select_point );
+			if( dist < shortest_dist )
+			{	
+				shortest_dist = dist;
+				shortest_obj = &objects[i];
+			}
+		}
+	}
+	selected = shortest_obj;
+	printf("Locate: shortest_dist=%f\n", shortest_dist );
+}
+
 void Model::Clock()
 {
 	frame ++;
@@ -57,18 +91,20 @@ void Model::AddPoint( float x, float y, float z, int ref, int lifetime )
 
 
 void Model::AddClickTri( float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, int ref, int lifetime )
-
-
 {
-	// for the moment, just add 3 lines
-	Line *a = new Line( x1,y1,z1,  x2, y2, z2 );
-	AddLine( *a, ref, lifetime );
-
-	a = new Line( x2,y2,z2,  x3, y3, z3 );
-	AddLine( *a, ref, lifetime );
-
-	a = new Line( x3,y3,z3,  x1, y1, z1 );
-	AddLine( *a, ref, lifetime );
+	Point a;
+	a.x = x1;
+	a.y = y1;
+	a.z = z1;
+	Point b;
+	b.x = x2;
+	b.y = y2;
+	b.z = z2;
+	Point c;
+	c.x = x3;
+	c.y = y3;
+	c.z = z3;
+	AddTriangle( a,b,c, ref, lifetime );
 }
 
 void Model::AddLine( float x1, float y1, float z1, float x2, float y2, float z2, int ref, int lifetime )
@@ -78,6 +114,24 @@ void Model::AddLine( float x1, float y1, float z1, float x2, float y2, float z2,
 	Line *a = new Line( x1,y1,z1,  x2, y2, z2 );
 
 	AddLine( *a, ref, lifetime );
+}
+
+void Model::AddTriangle( Point a, Point b, Point c, int ref, int lifetime )
+{
+	for( int i = 0 ;i < NUM_OBJECTS; i++)
+		{
+		if (objects[i].allocated == false)
+		{
+			objects[i].type = OBJECT_TRIANGLE;
+			objects[i].point_a = a;
+			objects[i].point_b = b;
+			objects[i].point_c = c;
+			objects[i].ref = ref;
+			objects[i].allocated = true;
+			objects[i].expires = lifetime + frame;
+			break;
+		}
+	}
 }
 
 void Model::AddLine( Line line, int ref, int lifetime )

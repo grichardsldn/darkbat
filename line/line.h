@@ -5,6 +5,9 @@ class Point
 	float x;
 	float y;
 	float z;
+
+	int rendered_x;
+	int rendered_y;
 };
 
 class Line
@@ -26,6 +29,7 @@ class Point2d
 	float y;
 
 	void Tell();
+	float DistanceFrom( Point2d *other );
 };
 
 class Line2d

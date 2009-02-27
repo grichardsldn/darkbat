@@ -1,4 +1,7 @@
 all: main
+
+clean:
+	rm main *.o
 CC=g++
 
 line.o: Makefile line.cpp

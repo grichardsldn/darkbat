@@ -20,7 +20,8 @@ class View : public GWindow
 	Model *model;
 
 	private:
-	void DrawPoint( Point p );
-	void DrawLine( Point a, Point b );
+	void DrawPoint( Point &p );
+	void DrawLine( Point &a, Point &b, bool highlight = false );
+	void DrawTriangle( Point &a, Point &b, Point &c, bool highlight = false );
 	void MapPoint( Point p, int *x, int *y);
 };

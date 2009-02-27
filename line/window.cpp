@@ -7,6 +7,9 @@
 #include <unistd.h>
 #include "window.h"
 
+class Model;
+extern Model *model;
+
 void GWindow::Tick()
 {
 }
@@ -14,6 +17,7 @@ void GWindow::Tick()
 GWindow::GWindow( )
 {
 	quit_posted = false;
+	selected = NULL;
 }
 
 void GWindow::Press( int x, int y )

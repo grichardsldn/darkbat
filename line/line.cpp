@@ -52,9 +52,9 @@ Line2d::Line2d()
 
 void Line2d::Tell()
 {
-	printf("Line2d: &%08x\n", (unsigned int) this);
-	printf(" start.x=%f start.y=%f finish.x=%f finish.y=%f\n", 
-		start.x, start.y, finish.x, finish.y );
+	//printf("Line2d: &%08x\n", (unsigned int) this);
+	//printf(" start.x=%f start.y=%f finish.x=%f finish.y=%f\n", 
+	//	start.x, start.y, finish.x, finish.y );
 }
 
 void Line2d::Set( Point2d a, Point2d b )
@@ -90,18 +90,18 @@ bool Line2d::Intersects( Line2d *other, Point2d *crosses )
 
 	intersects = myslope.Intersects( &otherslope, crosses );
 
-	printf("slopes intersect at %f %f\n", crosses->x, crosses->y);
+	//printf("slopes intersect at %f %f\n", crosses->x, crosses->y);
 
 	if( intersects == true )
 	{
-		printf("Slopes intersect\n");
+		//printf("Slopes intersect\n");
 		float x = crosses->x;
 
 		if (	(!Within( x, start.x, finish.x)) || 
 			(!Within( x, other->start.x, other->finish.x)) )
 		{
 			// it meets out of x bounds
-			printf("Out of x bounds\n");
+			//printf("Out of x bounds\n");
 			intersects = false;
 		}
 
@@ -111,7 +111,7 @@ bool Line2d::Intersects( Line2d *other, Point2d *crosses )
 			(!Within( y, other->start.y, other->finish.y)) )
 		{
 			// it meets out of y bounds
-			printf("Out of y bounds\n");
+			//printf("Out of y bounds\n");
 			intersects = false;
 		}
 	}
@@ -133,7 +133,7 @@ void Slope2d::Set( Point2d start, Point2d finish )
 	float dx1 = finish.x - start.x;
 	float dy1 = finish.y - start.y;
 
-	printf("dx1=%f dy1=%f\n", dx1, dy1);
+	//printf("dx1=%f dy1=%f\n", dx1, dy1);
 
 	if( fabsf(dx1) >= fabsf(dy1) )
 	{
@@ -160,7 +160,7 @@ void Slope2d::Set( Point2d start, Point2d finish )
 		}
 		else
 		{
-			printf("dx1=%f:\n", dx1 );
+			//printf("dx1=%f:\n", dx1 );
 			//assert( 0 );
 		}
 	}
@@ -188,7 +188,7 @@ bool Slope2d::Intersects( Slope2d *other, Point2d *crosses )
 
 			float the_x = top / bottom;
 			
-			printf("Points cross at x=%f\n", the_x );
+			//printf("Points cross at x=%f\n", the_x );
 
 			crosses->x = the_x;
 			crosses->y = (grad * the_x) + crosses_origin;
@@ -228,16 +228,20 @@ bool Slope2d::Intersects( Slope2d *other, Point2d *crosses )
 
 void Slope2d::Tell()
 {
-	printf("Slope2d:&%08x\n", (unsigned int)this);
-	printf("  grad=%f crosses_origin=%f by_y=%d\n", grad, crosses_origin, 
-		by_y );
+	//printf("Slope2d:&%08x\n", (unsigned int)this);
+	//printf("  grad=%f crosses_origin=%f by_y=%d\n", grad, crosses_origin, 
+//		by_y );
 }
 
 void Point2d::Tell()
 {
-	printf("Point2d:&%08x: x=%f y=%f\n", (unsigned int)this, x, y );
+	//printf("Point2d:&%08x: x=%f y=%f\n", (unsigned int)this, x, y );
 }
 
+float Point2d::DistanceFrom( Point2d *other )
+{
+	float dx = other->x - x;
+	float dy = other->y - y;
 
-
-	
+	return sqrt(( dx*dx) + (dy*dy) );
+}	
