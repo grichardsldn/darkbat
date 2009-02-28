@@ -352,7 +352,9 @@ main()
 
 
 	dkbShape tri;
-	tri.addClickTriangle( 0,0,0, 1,1,1, 3,1,2, 0, NULL,0 );
+	tri.addClickTriangle( 0,0,0, 1,1,1, 3,1,2, 0, NULL,100 );
+	dkbShape tri2;
+	tri2.addClickTriangle( 3,0,0, 1,1,1, 3,1,2, 0, NULL,101 );
 
 	dkbObj obj;
 	dkbPos pos;
@@ -371,9 +373,10 @@ main()
 	obj.addShape( &cube ,angle, pos,  1 );	
 	usleep(300000);
 	obj.addShape( &tri ,angle, pos,  2 );	
+	obj.addShape( &tri2 ,angle, pos,  3 );	
 
 
-	sleep(2);
-	obj.removeShape( 2 );	
+	sleep(8);
+	//obj.removeShape( 2 );	
 	sleep(10);
 }	
