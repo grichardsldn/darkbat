@@ -4,7 +4,18 @@
 #include "line.h"
 #include "model.h"
 
+void Model::Press(int key )
+{
+	if (selected != NULL )
+	{
+		printf("Signal clickref %d key %c\n",
+			selected->clickref, key );
+	}
+}
 
+
+// set 'selected' to point to the object that is nearest to
+// the specified on-screen co-ordinates
 Object *Model::Locate( int x, int y )
 {
 	float shortest_dist = 10000.0;
@@ -28,6 +39,18 @@ Object *Model::Locate( int x, int y )
 			test_point.y = (float)objects[i].point_a.rendered_y;
 
 			float dist = test_point.DistanceFrom( &select_point );
+
+			test_point.x = (float)objects[i].point_b.rendered_x;
+			test_point.y = (float)objects[i].point_b.rendered_y;
+
+			dist += test_point.DistanceFrom( &select_point );
+			test_point.x = (float)objects[i].point_c.rendered_x;
+			test_point.y = (float)objects[i].point_c.rendered_y;
+
+			dist += test_point.DistanceFrom( &select_point );
+
+			dist /= 3.0;
+
 			if( dist < shortest_dist )
 			{	
 				shortest_dist = dist;
@@ -90,7 +113,8 @@ void Model::AddPoint( float x, float y, float z, int ref, int lifetime )
 }
 
 
-void Model::AddClickTri( float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, int ref, int lifetime )
+
+void Model::AddClickTri( float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, int ref, int lifetime, int clickref )
 {
 	Point a;
 	a.x = x1;
@@ -104,7 +128,7 @@ void Model::AddClickTri( float x1, float y1, float z1, float x2, float y2, float
 	c.x = x3;
 	c.y = y3;
 	c.z = z3;
-	AddTriangle( a,b,c, ref, lifetime );
+	AddTriangle( a,b,c, ref, lifetime, clickref );
 }
 
 void Model::AddLine( float x1, float y1, float z1, float x2, float y2, float z2, int ref, int lifetime )
@@ -116,7 +140,7 @@ void Model::AddLine( float x1, float y1, float z1, float x2, float y2, float z2,
 	AddLine( *a, ref, lifetime );
 }
 
-void Model::AddTriangle( Point a, Point b, Point c, int ref, int lifetime )
+void Model::AddTriangle( Point a, Point b, Point c, int ref, int lifetime, int clickref )
 {
 	for( int i = 0 ;i < NUM_OBJECTS; i++)
 		{
@@ -129,6 +153,7 @@ void Model::AddTriangle( Point a, Point b, Point c, int ref, int lifetime )
 			objects[i].ref = ref;
 			objects[i].allocated = true;
 			objects[i].expires = lifetime + frame;
+			objects[i].clickref = clickref;
 			break;
 		}
 	}

@@ -99,7 +99,8 @@ void recv_pkt( char *bp )
 				(float)( y3 + pos_y),
 				(float)( z3 + pos_z),
 				ref +connection_ref,
-				50 );
+				50,
+				clickref );
 		}	
 		break;
 
@@ -188,7 +189,7 @@ int main(int argc, char **argv)
 		int a = (random() % 100) - 50;		
 		int b = (random() % 100) - 50;
 		int c = (random() % 3);
-		model.AddPoint( (float)a, -5.0 + c, (float)b, 1, 300);
+		model.AddPoint( (float)a, -5.0 + c, (float)b, 1, 30000);
 		//model.AddLine( (float)a, -5.0, (float)b, (float)oa, -5.0, (float)ob, 1 );
 		oa = a; 
 		ob = b;

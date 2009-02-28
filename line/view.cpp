@@ -38,6 +38,9 @@ void View::Key( int key )
 		viewpoint.z -= 1.0;
 		screenpoint.z -= 1.0;
 		break;
+
+		default:
+			model->Press( key );
 	}
 }
 

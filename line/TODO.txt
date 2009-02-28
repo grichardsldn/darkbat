@@ -1,3 +1,4 @@
-Have just added the ability to select a triangle.
+Have just added the ability to select a triangle.  Now need to make
+it signal back that a button has been pressed.
 
 

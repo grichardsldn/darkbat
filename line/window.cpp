@@ -17,7 +17,6 @@ void GWindow::Tick()
 GWindow::GWindow( )
 {
 	quit_posted = false;
-	selected = NULL;
 }
 
 void GWindow::Press( int x, int y )
