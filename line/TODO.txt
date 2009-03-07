@@ -1,4 +1,9 @@
-Have just added the ability to select a triangle.  Now need to make
-it signal back that a button has been pressed.
+Most important: 
+
+Sends a packet back to the api.  Can read the clickref, need to write
+the keypress and invoke the clickreceiver.  Trying to do this, I've
+got hurty head syndrome and canct conectrat.  This is all a bit mangled.
+
+Just remembers one IP at the moment.
 
 

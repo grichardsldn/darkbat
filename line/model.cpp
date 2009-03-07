@@ -3,13 +3,21 @@
 
 #include "line.h"
 #include "model.h"
+#include "UDPSocket.h"
+
+extern unsigned int from_addr;
+extern short from_port;
+extern UDPSocket sock;
 
 void Model::Press(int key )
 {
 	if (selected != NULL )
 	{
-		printf("Signal clickref %d key %c\n",
+		printf("Signal clickref addr &%04x port #%d #%d key %c\n",
+			from_addr, from_port,
 			selected->clickref, key );
+		sock.SetTarget( from_addr, from_port );
+		sock.Send( (char *)&selected->clickref, 4 );				
 	}
 }
 
@@ -114,7 +122,7 @@ void Model::AddPoint( float x, float y, float z, int ref, int lifetime )
 
 
 
-void Model::AddClickTri( float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, int ref, int lifetime, int clickref )
+void Model::AddClickTri( float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3, int ref, int from_id, int lifetime, int clickref )
 {
 	Point a;
 	a.x = x1;
@@ -128,7 +136,7 @@ void Model::AddClickTri( float x1, float y1, float z1, float x2, float y2, float
 	c.x = x3;
 	c.y = y3;
 	c.z = z3;
-	AddTriangle( a,b,c, ref, lifetime, clickref );
+	AddTriangle( a,b,c, ref, from_id, lifetime, clickref );
 }
 
 void Model::AddLine( float x1, float y1, float z1, float x2, float y2, float z2, int ref, int lifetime )
@@ -140,7 +148,7 @@ void Model::AddLine( float x1, float y1, float z1, float x2, float y2, float z2,
 	AddLine( *a, ref, lifetime );
 }
 
-void Model::AddTriangle( Point a, Point b, Point c, int ref, int lifetime, int clickref )
+void Model::AddTriangle( Point a, Point b, Point c, int ref, int from_id, int lifetime, int clickref )
 {
 	for( int i = 0 ;i < NUM_OBJECTS; i++)
 		{
@@ -151,6 +159,7 @@ void Model::AddTriangle( Point a, Point b, Point c, int ref, int lifetime, int c
 			objects[i].point_b = b;
 			objects[i].point_c = c;
 			objects[i].ref = ref;
+			objects[i].from_id = from_id;
 			objects[i].allocated = true;
 			objects[i].expires = lifetime + frame;
 			objects[i].clickref = clickref;

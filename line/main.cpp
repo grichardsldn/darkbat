@@ -24,7 +24,7 @@ int readInt( char *bp, char **bpp )
 
 	Model model;
 
-void recv_pkt( char *bp )
+void recv_pkt( char *bp, int from_id)
 {
 	int magic;
 
@@ -98,7 +98,7 @@ void recv_pkt( char *bp )
 				(float)( x3 + pos_x),
 				(float)( y3 + pos_y),
 				(float)( z3 + pos_z),
-				ref +connection_ref,
+				ref + connection_ref, from_id,
 				50,
 				clickref );
 		}	
@@ -145,18 +145,21 @@ void recv_pkt( char *bp )
 	} while (type != DKB_END );
 }
 
+// these should go in a table referenced by from_id
+unsigned int from_addr;
+unsigned short from_port;
+UDPSocket sock;
+
 void *recv_thread( void *arg )
 {
-	UDPSocket sock;
-
 	sock.Bind( 1234, 0 );
 
 	char buf[1500];
 	for( ;; )
 	{
-		sock.ReceiveFrom( &buf[0], 1500);
+		sock.ReceiveFrom( &buf[0], 1500, &from_addr, &from_port);
 
-		recv_pkt( &buf[0]);	
+		recv_pkt( &buf[0], 0);	
 	}
 	
 }
