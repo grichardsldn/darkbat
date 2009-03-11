@@ -387,7 +387,7 @@ void dkbObj::Xmit()
 
 		txrx_socket->Send( &buffer[0], (int)(bp - &buffer[0]) );
 }
-
+/*
 class Receiver : public dkbClickReceiver
 {
 	public:
@@ -462,4 +462,4 @@ main()
 	//obj.removeShape( 2 );	
 	sleep(10);
 }	
-
+*/

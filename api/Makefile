@@ -1,10 +1,10 @@
-OBJECTS=UDPSocket.o dkb_api.o
+OBJECTS=UDPSocket.o dkb_api.o dkbtest.o
 
 CFLAGS=-g
 
 all: $(OBJECTS) main
 
-main: dkb_api.o Makefile
+main: ${OBJECTS} Makefile
 	g++ -o main ${OBJECTS} -lpthread
 clean:
 	rm main $(OBJECTS)
