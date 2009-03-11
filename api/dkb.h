@@ -4,7 +4,7 @@ class dkbElement;
 class dkbClickReceiver
 {
 	public:
-	virtual void ReceiveClick( int shape_ref ) = 0;
+	virtual void ReceiveClick( int shape_ref, int key ) = 0;
 };
 
 // shapes are relative to 0-0-0.
@@ -22,6 +22,10 @@ class dkbShape
 	dkbShape();
 
 	dkbElement *head;
+	//bool signalClick( int clickref );
+
+	void RxPress(int clickref, int key );
+
 	private:
 	void addElement( dkbElement *element );
 };
@@ -69,6 +73,9 @@ class dkbObj
 	static void *start_receive_thread(void *ptr);
 	void StartSendThread();
 	void StartReceiveThread();
+
+	// internal methods
+	void RxPress( int clickref, int key );
 	
 	private:
 	void Xmit();

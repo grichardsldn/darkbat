@@ -2,5 +2,12 @@ Ad the moment if I have two Shapes with the same ref, then
 becasue that ref gets used in the Model in the player and items
 are remoed before they are re-added to the Model, the net result 
 is that the first shape with a given ref gets replaced by one that
-follows it.
+follows it. - Not sure what that means.
+
+Have been able to signal a click back to a click receiver.
+
+Next to write a Vol class which presents a volume control and
+allows clicks to move that volumen control.
+
+
 

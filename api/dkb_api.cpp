@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <assert.h>
+#include <string.h>
 
 #include <pthread.h>
 #include "dkb.h"
@@ -38,6 +40,7 @@ class dkbShapeEntry
 	dkbPos position;
 	int ref;
 
+	void RxPress( int clickref, int key );
 	dkbShapeEntry();	
 };
 
@@ -62,8 +65,14 @@ class dkbElement
 
 	dkbElement();
 	char *write( char *buf);
+	void RxPress( int key );
 };
 
+void dkbShapeEntry::RxPress(int clickref, int key )
+{
+	assert( shape != NULL);
+	shape->RxPress( clickref, key );
+}
 
 char *dkbElement::write( char *buf )
 {
@@ -110,6 +119,29 @@ dkbElement::dkbElement()
 	type = ELEMENT_NONE;
 	next = NULL;
 	receiver = NULL;
+}
+
+void dkbElement::RxPress(int key )
+{	
+	printf("dkbElement::RxPress: clickref=#%d, key=#%d\n", clickref, key );
+	if( receiver != NULL)
+	{		
+		receiver->ReceiveClick( clickref, key );
+	}
+}
+
+void dkbShape::RxPress( int clickref, int key )
+{
+	dkbElement *cur = head;
+	while ( cur != NULL )
+	{		
+		if( cur->clickref == clickref )
+		{	
+			cur->RxPress( key );
+		}
+
+		cur = cur->next;
+	}
 }
 
 void dkbShape::addElement( dkbElement *element )
@@ -192,6 +224,8 @@ void dkbObj::Changed()
 void dkbObj::addShape( dkbShape *shape, dkbAngle angle, dkbPos trans,
 	int ref)
 {
+	assert( shape != NULL );
+
 	int found = -1;
 	for (int i = 0 ; i < 10 ; i++)
 	{
@@ -213,6 +247,19 @@ void dkbObj::addShape( dkbShape *shape, dkbAngle angle, dkbPos trans,
 	shapes[found]->allocated = true;
 
 	Changed();
+}
+
+void dkbObj::RxPress( int clickref, int key )
+{
+	printf("RxPress\n");
+	for (int i = 0 ; i < 10 ; i++)
+	{
+		printf("iteration %d\n", i );
+		if( shapes[i]->allocated == true)	
+		{
+			shapes[i]->RxPress( clickref, key );
+		}
+	}
 }
 
 bool dkbObj::connect( dkbBlock block )
@@ -237,6 +284,8 @@ void dkbObj::project( dkbBlock block, dkbPos pos )
 {
 	txrx_socket = new UDPSocket();
 	txrx_socket->Bind(0,0);
+	//txrx_socket->SetTarget(0xc0a80146, 1234);
+		
 	txrx_socket->SetTarget(0x7f000001, 1234);
 
 	pthread_create( &send_thread, NULL, start_send_thread, this);
@@ -276,7 +325,17 @@ void dkbObj::StartReceiveThread()
 	while(1)
 	{
 		txrx_socket->ReceiveFrom( &buffer[0], 1500, NULL, NULL );
-		printf("ReceiveThread: Received packet\n");
+		int *ip = (int*)&buffer[0];
+		int *key = (int*)&buffer[4];
+		printf("ReceiveThread: Received packet: clickref %d\n",
+			*ip);
+		for ( int obj = 0 ; obj<10; obj++)
+		{
+			if( shapes[obj]->allocated == true )
+			{
+				shapes[obj]->RxPress( *ip, *key );
+			}
+		}
 	}
 }
 
@@ -329,6 +388,26 @@ void dkbObj::Xmit()
 		txrx_socket->Send( &buffer[0], (int)(bp - &buffer[0]) );
 }
 
+class Receiver : public dkbClickReceiver
+{
+	public:
+	void ReceiveClick( int clickref, int key );
+	char name[1024];
+	Receiver( char *aname);
+};
+
+Receiver::Receiver( char *aname)
+{
+	strcpy( name, aname);
+}
+
+void Receiver::ReceiveClick( int clickref, int key )
+{
+	printf("Receiver %s got clickref %d, key %d\n",
+		name, clickref, key );
+}
+
+
 main()
 {
 	dkbShape cube;
@@ -351,10 +430,13 @@ main()
 	cube.addLine( 0,0,1, 0,1,1, 0 );
 
 
+	Receiver *rxa = new Receiver("A");
+	Receiver *rxb = new Receiver("B");
+
 	dkbShape tri;
-	tri.addClickTriangle( 0,0,0, 1,1,1, 3,1,2, 0, NULL,100 );
+	tri.addClickTriangle( 0,0,0, 1,1,1, 3,1,2, 0, rxa,100 );
 	dkbShape tri2;
-	tri2.addClickTriangle( 3,0,0, 1,1,1, 3,1,2, 0, NULL,101 );
+	tri2.addClickTriangle( 3,0,0, 1,1,1, 3,1,2, 0, rxb ,101 );
 
 	dkbObj obj;
 	dkbPos pos;
@@ -380,3 +462,4 @@ main()
 	//obj.removeShape( 2 );	
 	sleep(10);
 }	
+
