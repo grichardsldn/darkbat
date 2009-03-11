@@ -17,7 +17,12 @@ void Model::Press(int key )
 			from_addr, from_port,
 			selected->clickref, key );
 		sock.SetTarget( from_addr, from_port );
-		sock.Send( (char *)&selected->clickref, 4 );				
+		char buf[8];
+		int *ip=(int*)&buf[0];
+		*ip = selected->clickref;
+		ip++;
+		*ip=key;	
+		sock.Send( &buf[0], 8 );				
 	}
 }
 
