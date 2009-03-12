@@ -29,24 +29,34 @@ class Vol : public dkbClickReceiver
 {
 	public:
 	void ReceiveClick( int clickref, int key );
-	dkbObj *dkb_obj;	
 	dkbShape *shape;
+	dkbObj *dkb_obj;
 	int vol;
 	int ref;
+	int offset;
 
-	Vol( int def, int clickref);	
+	Vol( int def, int clickref, dkbObj *obj, int offset);	
 	private:
 	void ReDraw();
 };
 
-Vol::Vol( int def, int a_ref )
+class VolPanel
 {
-	vol = def;
-	ref = a_ref;
+	public:
+	Vol *vols[10];
+	VolPanel();
+	private:
+	dkbObj *dkb_obj;	
+};
+
+VolPanel::VolPanel()
+{
 	dkb_obj = new dkbObj();
-	shape = NULL;
-	
-	ReDraw();
+
+	for( int i = 0 ; i < 7 ; i++)
+	{
+		vols[i] = new Vol( 2, 300 + i, dkb_obj, i * 3 );
+	}
 
 	dkbBlock block;	
 	dkbPos pos;
@@ -54,6 +64,19 @@ Vol::Vol( int def, int a_ref )
 	pos.y = 0;
 	pos.z = 0;
 	dkb_obj->project( block, pos );
+}
+
+Vol::Vol( int def, int a_ref, dkbObj *a_obj, int a_offset )
+{
+	vol = def;
+	ref = a_ref;
+	dkb_obj = a_obj;
+	offset = a_offset;
+
+	shape = NULL;
+	
+	ReDraw();
+
 }
 
 void Vol::ReDraw()
@@ -68,12 +91,12 @@ void Vol::ReDraw()
 	int y = 3;
 	int z = 1;
 	shape = new dkbShape();		
-	//shape->addLine( x, y,z, x , y, z + 2,0 );
-	shape->addLine( x, y + 10, z, x , y + 10, z+2,0);
-	shape->addLine( x, y + vol, z, x, y + vol, z+2,0 );
-	shape->addClickTriangle(x, y, z,
-				 x, y, z + 2,
-				x, y - 1, x + 1,
+	//shape->addLine( x, y,z + offset , x , y, z + 2 + offset ,0 );
+	shape->addLine( x, y + 10, z + offset , x , y + 10, z+2 + offset ,0);
+	shape->addLine( x - 1, y + vol, z + offset , x - 1, y + vol, z+2 + offset ,0 );
+	shape->addClickTriangle(x, y, z + offset ,
+				 x, y, z + 2 + offset ,
+				x, y - 1, z + 1 + offset,
 				 0, this, ref );
 
 	dkbPos pos;
@@ -103,61 +126,6 @@ void Vol::ReceiveClick( int clickref, int key )
 
 main()
 {
-	Vol vol(2, 300);
+	VolPanel();
 	sleep(30);
 }
-
-void main2()
-{
-	dkbShape cube;
-	// lower face 
-	cube.addLine( 0,0,0, 1,0,0, 0);
-	cube.addLine( 1,0,0, 1,0,1, 0);
-	cube.addLine( 1,0,1, 0,0,1, 0);
-	cube.addLine( 0,0,1, 0,0,0, 0);
-
-	// upper face
-	cube.addLine( 0,1,0, 1,1,0, 0);
-	cube.addLine( 1,1,0, 1,1,1, 0);
-	cube.addLine( 1,1,1, 0,1,1, 0);
-	cube.addLine( 0,1,1, 0,1,0, 0);
-
-	// connect the two
-	cube.addLine( 0,0,0, 0,1,0, 0 );
-	cube.addLine( 1,0,0, 1,1,0, 0 );
-	cube.addLine( 1,0,1, 1,1,1, 0 );
-	cube.addLine( 0,0,1, 0,1,1, 0 );
-
-
-	Receiver *rxa = new Receiver("A");
-	Receiver *rxb = new Receiver("B");
-
-	dkbShape tri;
-	tri.addClickTriangle( 0,0,0, 1,1,1, 3,1,2, 0, rxa,100 );
-	dkbShape tri2;
-	tri2.addClickTriangle( 3,0,0, 1,1,1, 3,1,2, 0, rxb ,101 );
-
-	dkbObj obj;
-	dkbPos pos;
-	pos.x = 0;
-	pos.y = 0;
-	pos.z = 0;
-	dkbAngle angle;
-	obj.addShape( &cube ,angle, pos,  0 );	
-	dkbBlock block;	
-	obj.project( block, pos );
-
-	usleep(300000);
-	pos.x = 0;
-	pos.y = 5;
-	pos.z = 0;
-	obj.addShape( &cube ,angle, pos,  1 );	
-	usleep(300000);
-	obj.addShape( &tri ,angle, pos,  2 );	
-	obj.addShape( &tri2 ,angle, pos,  3 );	
-
-
-	sleep(8);
-	//obj.removeShape( 2 );	
-	sleep(30);
-}	

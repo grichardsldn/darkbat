@@ -4,8 +4,8 @@ are remoed before they are re-added to the Model, the net result
 is that the first shape with a given ref gets replaced by one that
 follows it. - Not sure what that means.
 
-Have written Vol class that dispays a volume control that
-can be manipulated. 
+Next need to write being able to create multiple dkkbObjects
+and have them use the same socket.
 
 
 
