@@ -119,6 +119,7 @@ dkbElement::dkbElement()
 	type = ELEMENT_NONE;
 	next = NULL;
 	receiver = NULL;
+	clickref = -1;
 }
 
 void dkbElement::RxPress(int key )
@@ -132,6 +133,7 @@ void dkbElement::RxPress(int key )
 
 void dkbShape::RxPress( int clickref, int key )
 {
+	printf("dkbShape::RxPress\n");
 	dkbElement *cur = head;
 	while ( cur != NULL )
 	{		
@@ -217,7 +219,9 @@ void dkbObj::Changed()
 {
 	if( projecting )
 	{
+		printf("Calling XMmit()\n");
 		Xmit();
+		printf("Called XMmit()\n");
 	}
 }
 
@@ -360,7 +364,7 @@ void dkbObj::Xmit()
 	bp = writeInt( bp, DKB_CONNECTION_REF );
 	bp = writeInt( bp, ref );
 
-	printf("project: shapes are:\n");
+	printf("Xmit shapes are:\n");
 	for( int i = 0 ; i <10 ; i++)
 	{
 		if (shapes[i]->allocated)

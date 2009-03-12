@@ -4,10 +4,8 @@ are remoed before they are re-added to the Model, the net result
 is that the first shape with a given ref gets replaced by one that
 follows it. - Not sure what that means.
 
-Have been able to signal a click back to a click receiver.
-
-Next to write a Vol class which presents a volume control and
-allows clicks to move that volumen control.
+Have written Vol class that dispays a volume control that
+can be manipulated. 
 
 
 

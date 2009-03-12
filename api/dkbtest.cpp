@@ -25,9 +25,89 @@ void Receiver::ReceiveClick( int clickref, int key )
 		name, clickref, key );
 }
 
+class Vol : public dkbClickReceiver
+{
+	public:
+	void ReceiveClick( int clickref, int key );
+	dkbObj *dkb_obj;	
+	dkbShape *shape;
+	int vol;
+	int ref;
 
+	Vol( int def, int clickref);	
+	private:
+	void ReDraw();
+};
+
+Vol::Vol( int def, int a_ref )
+{
+	vol = def;
+	ref = a_ref;
+	dkb_obj = new dkbObj();
+	shape = NULL;
+	
+	ReDraw();
+
+	dkbBlock block;	
+	dkbPos pos;
+	pos.x = 0;
+	pos.y = 0;
+	pos.z = 0;
+	dkb_obj->project( block, pos );
+}
+
+void Vol::ReDraw()
+{
+	dkb_obj->removeShape( ref );
+	if (shape != NULL )
+	{
+		delete shape;
+	}
+
+	int x = 1;
+	int y = 3;
+	int z = 1;
+	shape = new dkbShape();		
+	//shape->addLine( x, y,z, x , y, z + 2,0 );
+	shape->addLine( x, y + 10, z, x , y + 10, z+2,0);
+	shape->addLine( x, y + vol, z, x, y + vol, z+2,0 );
+	shape->addClickTriangle(x, y, z,
+				 x, y, z + 2,
+				x, y - 1, x + 1,
+				 0, this, ref );
+
+	dkbPos pos;
+	pos.x = 0;
+	pos.y = 0;
+	pos.z = 0;
+
+	dkbAngle angle;
+	printf("Calling addShape from ReDraw\n");
+	dkb_obj->addShape( shape, angle, pos, ref);
+	printf("Called addShape from ReDraw\n");
+}
+
+void Vol::ReceiveClick( int clickref, int key )
+{
+	if( key == '1' )
+	{
+		if( vol > 0 ) vol --;
+	}
+	if( key =='2' )
+	{
+		if( vol < 10 ) vol ++;
+	}
+	printf("vol=%d\n", vol);
+	ReDraw();
+}
 
 main()
+{
+	Vol vol(2, 300);
+	sleep(30);
+}
+
+void main2()
 {
 	dkbShape cube;
 	// lower face 
@@ -79,5 +159,5 @@ main()
 
 	sleep(8);
 	//obj.removeShape( 2 );	
-	sleep(10);
+	sleep(30);
 }	
