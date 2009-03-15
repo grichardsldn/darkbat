@@ -80,7 +80,7 @@ class dkbObj
 	private:
 	void Xmit();
 	void Changed();
-	dkbShapeEntry *shapes[10];
+	dkbShapeEntry *shapes[15];
 	dkbPos position;
 	pthread_t send_thread;
 	pthread_t receive_thread;

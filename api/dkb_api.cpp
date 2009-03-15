@@ -207,7 +207,7 @@ dkbObj::dkbObj()
 {
 	ref = random() & 0x7fff;
 
-	for (int i = 0 ; i < 10 ; i++)
+	for (int i = 0 ; i < 15 ; i++)
 	{
 		shapes[i] = new dkbShapeEntry();
 	}
@@ -231,7 +231,7 @@ void dkbObj::addShape( dkbShape *shape, dkbAngle angle, dkbPos trans,
 	assert( shape != NULL );
 
 	int found = -1;
-	for (int i = 0 ; i < 10 ; i++)
+	for (int i = 0 ; i < 15 ; i++)
 	{
 		if( shapes[i]->allocated == false)	
 		{
@@ -256,7 +256,7 @@ void dkbObj::addShape( dkbShape *shape, dkbAngle angle, dkbPos trans,
 void dkbObj::RxPress( int clickref, int key )
 {
 	printf("RxPress\n");
-	for (int i = 0 ; i < 10 ; i++)
+	for (int i = 0 ; i < 15 ; i++)
 	{
 		printf("iteration %d\n", i );
 		if( shapes[i]->allocated == true)	
@@ -274,7 +274,7 @@ bool dkbObj::connect( dkbBlock block )
 void dkbObj::removeShape( int ref )
 {
 	int found = -1;
-	for (int i = 0 ; i < 10 ; i++)
+	for (int i = 0 ; i < 15 ; i++)
 	{
 		if( shapes[i]->ref == ref)	
 		{
@@ -333,7 +333,7 @@ void dkbObj::StartReceiveThread()
 		int *key = (int*)&buffer[4];
 		printf("ReceiveThread: Received packet: clickref %d\n",
 			*ip);
-		for ( int obj = 0 ; obj<10; obj++)
+		for ( int obj = 0 ; obj<15; obj++)
 		{
 			if( shapes[obj]->allocated == true )
 			{
@@ -365,7 +365,7 @@ void dkbObj::Xmit()
 	bp = writeInt( bp, ref );
 
 	printf("Xmit shapes are:\n");
-	for( int i = 0 ; i <10 ; i++)
+	for( int i = 0 ; i <15 ; i++)
 	{
 		if (shapes[i]->allocated)
 		{
