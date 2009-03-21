@@ -44,25 +44,25 @@ class VolPanel
 {
 	public:
 	Vol *vols[10];
-	VolPanel();
+	VolPanel(int x, int y, int z);
 	private:
 	dkbObj *dkb_obj;	
 };
 
-VolPanel::VolPanel()
+VolPanel::VolPanel(int x, int y, int z)
 {
 	dkb_obj = new dkbObj();
 
-	for( int i = 0 ; i < 7 ; i++)
+	for( int i = 0 ; i < 6 ; i++)
 	{
 		vols[i] = new Vol( 2, 300 + i, dkb_obj, i * 3 );
 	}
 
 	dkbBlock block;	
 	dkbPos pos;
-	pos.x = 0;
-	pos.y = 0;
-	pos.z = 0;
+	pos.x = x;
+	pos.y = y;
+	pos.z = z;
 	dkb_obj->project( block, pos );
 }
 
@@ -126,6 +126,8 @@ void Vol::ReceiveClick( int clickref, int key )
 
 main()
 {
-	VolPanel();
+	VolPanel(-50,-20,5);
+	VolPanel(-10,0,0);
+	VolPanel(30,30,30);
 	sleep(30);
 }
