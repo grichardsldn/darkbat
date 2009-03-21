@@ -26,6 +26,8 @@ char *writeInt( char *buf, int val)
 	
 char *dkbPos::write( char *buf )
 {
+	printf("GDR: dkbPos::write: writing %d %d %d\n",
+		x,y,z );
 	buf = writeInt( buf, x );
 	buf = writeInt( buf, y );
 	buf = writeInt( buf, z );
@@ -205,7 +207,11 @@ dkbShapeEntry::dkbShapeEntry()
 
 dkbObj::dkbObj()
 {
-	ref = random() & 0x7fff;
+	FILE *inptr = fopen("/dev/urandom", "rb");
+	int anint;
+	fread( &ref, 4, 1, inptr );
+	fclose( inptr );
+	ref &= 0x7fff;
 
 	for (int i = 0 ; i < 15 ; i++)
 	{
@@ -288,8 +294,12 @@ void dkbObj::project( dkbBlock block, dkbPos pos )
 {
 	txrx_socket = new UDPSocket();
 	txrx_socket->Bind(0,0);
-	//txrx_socket->SetTarget(0xc0a80146, 1234);
-		
+
+	position.x = pos.x;
+	position.y = pos.y;
+	position.z = pos.z;
+
+	//txrx_socket->SetTarget(0xc0a80147, 1234);
 	txrx_socket->SetTarget(0x7f000001, 1234);
 
 	pthread_create( &send_thread, NULL, start_send_thread, this);
@@ -362,7 +372,12 @@ void dkbObj::Xmit()
 	bp = writeInt( bp, DKB_1_MAGIC );
 
 	bp = writeInt( bp, DKB_CONNECTION_REF );
+	printf("GDR: Writing ref #%d\n", ref );
 	bp = writeInt( bp, ref );
+
+	// write the object poition
+	bp = writeInt( bp, DKB_POS );
+	bp = position.write( bp );
 
 	printf("Xmit shapes are:\n");
 	for( int i = 0 ; i <15 ; i++)
@@ -374,7 +389,7 @@ void dkbObj::Xmit()
 			bp = writeInt( bp, shapes[i]->ref );
 
 			// write the position for this shape
-			bp = writeInt( bp, DKB_POS );
+			bp = writeInt( bp, DKB_RELPOS );
 			bp = shapes[i]->position.write( bp );
 		
 			dkbElement *cur = shapes[i]->shape->head;
