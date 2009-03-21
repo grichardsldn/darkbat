@@ -4,6 +4,7 @@ Sends a packet back to the api.  Can read the clickref, need to write
 the keypress and invoke the clickreceiver.  Trying to do this, I've
 got hurty head syndrome and canct conectrat.  This is all a bit mangled.
 
-Just remembers one IP at the moment.
-
+Its able to send to both, but when I run the client again I 
+get list in the source table. I think something isnt adding the references
+correctly.
 

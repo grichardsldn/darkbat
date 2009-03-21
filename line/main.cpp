@@ -10,7 +10,7 @@
 #include "view.h"
 #include "UDPSocket.h"
 #include "../common/dkb_const.h"
-
+#include "source.h"
 
 int readInt( char *bp, char **bpp )
 {
@@ -24,7 +24,7 @@ int readInt( char *bp, char **bpp )
 
 	Model model;
 
-void recv_pkt( char *bp, int from_id)
+void recv_pkt( char *bp, int from_id, unsigned int address, unsigned short port)
 {
 	int magic;
 
@@ -43,11 +43,16 @@ void recv_pkt( char *bp, int from_id)
 	}
 	int connection_ref = readInt( bp, &bp );
 
+	Source::Record( port, address, connection_ref );
+
 	int type;
 	int ref;
 	int pos_x = 0;
 	int pos_y = 0;
 	int pos_z = 0;
+	int object_pos_x = 0;
+	int object_pos_y = 0;
+	int object_pos_z = 0;
 
 	do
 	{
@@ -62,9 +67,15 @@ void recv_pkt( char *bp, int from_id)
 		break;
 	
 		case DKB_POS:
-			pos_x = readInt( bp, &bp);
-			pos_y = readInt( bp, &bp);
-			pos_z = readInt( bp, &bp);		
+			object_pos_x = readInt( bp, &bp);
+			object_pos_y = readInt( bp, &bp);
+			object_pos_z = readInt( bp, &bp);		
+		break;
+
+		case DKB_RELPOS:
+			pos_x = readInt( bp, &bp) + object_pos_x;
+			pos_y = readInt( bp, &bp) + object_pos_y;
+			pos_z = readInt( bp, &bp) + object_pos_z;		
 		break;
 
 		case DKB_ELEMENT_CLICKTRI:
@@ -87,8 +98,8 @@ void recv_pkt( char *bp, int from_id)
 			col = readInt( bp, &bp );
 			clickref= readInt( bp, &bp);
 
-			printf("GDR: AddTri %d %d %d %d %d %d %d %d %d\n",
-				x1,y1,z1,x2,y2,z2,x3,y3,z3);	
+			//printf("GDR: AddTri %d %d %d %d %d %d %d %d %d\n",
+		//		x1,y1,z1,x2,y2,z2,x3,y3,z3);	
 			model.AddClickTri( (float)(x1 + pos_x),
 				(float)( y1 + pos_y),
 				(float)( z1 + pos_z),
@@ -98,7 +109,7 @@ void recv_pkt( char *bp, int from_id)
 				(float)( x3 + pos_x),
 				(float)( y3 + pos_y),
 				(float)( z3 + pos_z),
-				ref + connection_ref, from_id,
+				ref + connection_ref, connection_ref, from_id,
 				50,
 				clickref );
 		}	
@@ -118,15 +129,15 @@ void recv_pkt( char *bp, int from_id)
 			z2 = readInt( bp, &bp);	
 			col = readInt( bp, &bp );
 
-			printf("GDR: AddLine %d %d %d %d %d %d\n",
-				x1,y1,z1,x2,y2,z2);	
+			//printf("GDR: AddLine %d %d %d %d %d %d\n",
+		//		x1,y1,z1,x2,y2,z2);	
 			model.AddLine( (float)(x1 + pos_x),
 				(float)( y1 + pos_y),
 				(float)( z1 + pos_z),
 				(float)( x2 + pos_x),
 				(float)( y2 + pos_y),
 				(float)( z2 + pos_z),
-				ref +connection_ref,
+				ref +connection_ref, connection_ref,
 				100 );
 		}
 		break;
@@ -145,9 +156,6 @@ void recv_pkt( char *bp, int from_id)
 	} while (type != DKB_END );
 }
 
-// these should go in a table referenced by from_id
-unsigned int from_addr;
-unsigned short from_port;
 UDPSocket sock;
 
 void *recv_thread( void *arg )
@@ -157,9 +165,11 @@ void *recv_thread( void *arg )
 	char buf[1500];
 	for( ;; )
 	{
-		sock.ReceiveFrom( &buf[0], 1500, &from_addr, &from_port);
+		unsigned int address;
+		unsigned short port;
+		sock.ReceiveFrom( &buf[0], 1500, &address, &port);
 
-		recv_pkt( &buf[0], 0);	
+		recv_pkt( &buf[0], 0, address, port);	
 	}
 	
 }
@@ -174,15 +184,15 @@ int main(int argc, char **argv)
 	//model.AddPoint( 5.0, 0.0, 1.0, 0);
 	//model.AddPoint( 6.0, 0.0, 1.0, 0);
 
-	model.AddLine( 5.0, 0.0, 1.0, 6.0, 0.0, 1.0, 1, 200);
+	model.AddLine( 5.0, 0.0, 1.0, 6.0, 0.0, 1.0, 1,0, 200);
 
-	model.AddPoint( 6.0, 0.0, 2.0, 0, 200);
-	model.AddPoint( 7.0, 0.0, 2.0, 0, 200);
-	model.AddPoint( 7.0, 1.0, 2.0, 0, 200);
-	model.AddPoint( 5.0, 0.0, -0.5, 0, 200);
-	model.AddPoint( 7.0, 1.0, 2.2, 0, 200);
-	model.AddPoint( 7.0, 1.0, 2.4, 0, 200);
-	model.AddPoint( 7.0, 1.0, 2.6, 0, 200);
+	model.AddPoint( 6.0, 0.0, 2.0, 0,0, 200);
+	model.AddPoint( 7.0, 0.0, 2.0, 0,0, 200);
+	model.AddPoint( 7.0, 1.0, 2.0, 0,0, 200);
+	model.AddPoint( 5.0, 0.0, -0.5, 0,0, 200);
+	model.AddPoint( 7.0, 1.0, 2.2, 0,0, 200);
+	model.AddPoint( 7.0, 1.0, 2.4, 0,0, 200);
+	model.AddPoint( 7.0, 1.0, 2.6, 0,0, 200);
 
 	int oa = 0;
 	int ob = 0;
@@ -192,7 +202,7 @@ int main(int argc, char **argv)
 		int a = (random() % 100) - 50;		
 		int b = (random() % 100) - 50;
 		int c = (random() % 3);
-		model.AddPoint( (float)a, -5.0 + c, (float)b, 1, 30000);
+		model.AddPoint( (float)a, -5.0 + c, (float)b, 1,0, 30000);
 		//model.AddLine( (float)a, -5.0, (float)b, (float)oa, -5.0, (float)ob, 1 );
 		oa = a; 
 		ob = b;
