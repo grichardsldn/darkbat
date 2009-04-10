@@ -76,7 +76,7 @@ void View::Press( int x, int y)
 	//Draw();
 }
 
-void View::MapPoint( Point p, int *x_out, int *y_out )
+bool View::MapPoint( Point p, int *x_out, int *y_out )
 {
         //printf("MapPoint: %f,%f,%f\n", p.x,p.y,p.z);
 
@@ -116,7 +116,7 @@ void View::MapPoint( Point p, int *x_out, int *y_out )
         {
                 //printf("Doesnt intersect\n");
                 // Nothing to see
-                return;
+                return false;
         }
         //printf("intersects at %f %f\n", ipoint.x, ipoint.y );
 
@@ -150,7 +150,7 @@ void View::MapPoint( Point p, int *x_out, int *y_out )
         {
                 ////printf("Lines dont intersect in y.\n");
                 // Nothing to see
-                return;
+                return false;
         }
         ////printf("Lines intersect in y: %f,%f\n", ipoint.x, ipoint.y);
 
@@ -168,6 +168,8 @@ void View::MapPoint( Point p, int *x_out, int *y_out )
 
 	*x_out = x;
 	*y_out = y;
+	
+	return true;
 }
 
 void View::DrawPoint( Point &p )
@@ -278,11 +280,25 @@ void View::DrawPoint( Point &p )
 void View::DrawTriangle( Point &a, Point &b, Point &c,bool highlight )
 {
 	int x1,y1, x2,y2, x3,y3;
-	
-	MapPoint( a, &x1, &y1);
-	MapPoint( b, &x2, &y2);
-	MapPoint( c, &x3, &y3);
 
+	bool offscreen = false;	
+	if( MapPoint( a, &x1, &y1) == false )
+	{
+		offscreen = true;
+	}
+	if( MapPoint( b, &x2, &y2) == false )
+	{
+		offscreen = true;
+	}
+	if( MapPoint( c, &x3, &y3) == false )
+	{
+		offscreen = true;
+	}
+
+	if( offscreen == true ) 
+	{
+		return ;
+	}
 	a.rendered_x = x1;
 	a.rendered_y = y1;
 	b.rendered_x = x2;
@@ -310,8 +326,20 @@ void View::DrawLine( Point &a, Point &b, bool highlight )
 {
 	int x1,y1, x2,y2;
 	
-	MapPoint( a, &x1, &y1);
-	MapPoint( b, &x2, &y2);
+	bool offscreen = false;	
+	if( MapPoint( a, &x1, &y1) ==false)
+	{
+		offscreen=true;
+	}
+	if( MapPoint( b, &x2, &y2) == false )
+	{
+		offscreen=true;
+	}
+
+	if( offscreen == true )
+	{
+		return;
+	}
 
 	a.rendered_x = x1;
 	a.rendered_y = y1;
