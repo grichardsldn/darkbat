@@ -34,6 +34,14 @@ void View::Key( int key )
 		viewpoint.z += 1.0;
 		screenpoint.z += 1.0;
 		break;
+		case ',':
+		viewpoint.y -= 1.0;
+		screenpoint.y -= 1.0;
+		break;
+		case 'u':
+		viewpoint.y += 1.0;
+		screenpoint.y += 1.0;
+		break;
 		case 'l':
 		viewpoint.z -= 1.0;
 		screenpoint.z -= 1.0;
