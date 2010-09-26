@@ -197,10 +197,10 @@ int main(int argc, char **argv)
 	int oa = 0;
 	int ob = 0;
 	// add random dots on the floor
-	for( int i = 0 ; i < 60 ; i++)
+	for( int i = 0 ; i < 160 ; i++)
 	{	
-		int a = (random() % 100) - 50;		
-		int b = (random() % 100) - 50;
+		int a = (random() % 400) - 200;		
+		int b = (random() % 400) - 200;
 		int c = (random() % 3);
 		model.AddPoint( (float)a, -5.0 + c, (float)b, 1,0, 30000);
 		//model.AddLine( (float)a, -5.0, (float)b, (float)oa, -5.0, (float)ob, 1 );

@@ -236,7 +236,7 @@ void GWindow::Run( int x, int y, int argc, char **argv)
 		break;
          }
 	}
-	usleep(10000);
+	usleep(50000);
 	Tick();
 	}
 

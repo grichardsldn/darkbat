@@ -1,7 +1,7 @@
 
 // requires line.h
 
-#define NUM_OBJECTS (220)
+#define NUM_OBJECTS (320)
 
 #define OBJECT_POINT (1)
 #define OBJECT_LINE (2)

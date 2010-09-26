@@ -4,6 +4,15 @@
 #include "line.h"
 #include "model.h"
 #include "view.h"
+#include <string.h>
+
+#define DISPLAY_X ( 400 )
+#define DISPLAY_Y ( 400)
+#define MID_DISPLAY_X ( 200 )
+#define MID_DISPLAY_Y ( 200 )
+// think the below means the size from the centre to the edge
+#define SCREEN_X (2.0)
+#define SCREEN_Y (2.0)
 
 View::View( Model *a_model )
 {
@@ -15,9 +24,29 @@ View::View( Model *a_model )
 	screenpoint.y = 1.0;
 	screenpoint.z = 2.0;
 
+	view = 0;
+	SetWhiteColour();
+
 	model = a_model;
 }
-
+void View::SetWhiteColour()
+{
+	switch (view)
+	{
+		case 0:
+			strcpy( white_colour, "white");
+			strcpy( highlight_colour, "green");
+		break;
+		case 1: 
+			strcpy( white_colour, "cyan");
+			strcpy( highlight_colour, "green");
+		break;
+		case 2: 
+			strcpy( white_colour, "red");
+			strcpy( highlight_colour, "black");
+		break;
+	}
+}
 void View::Key( int key )
 {
 	switch (key)
@@ -54,12 +83,31 @@ void View::Key( int key )
 
 void View::Tick()
 {
-	viewpoint.x -= 0.05;
-	screenpoint.x -= 0.05;
-	Draw();
-	model->Clock();
+	float eye_amount = 0.20;
+	//viewpoint.x -= 0.01;
+	//screenpoint.x -= 0.01;
+	if( view > 0 )
+	{
 	
+	view = 1;
+	SetWhiteColour();
+	Draw();
+	viewpoint.z += eye_amount;
+	screenpoint.z += eye_amount;
+	view = 2;
+	SetWhiteColour();
+	Draw();
+	viewpoint.z -= eye_amount;
+	screenpoint.z -= eye_amount;
+	}
+	else
+	{
+		Draw();
+	}
+	model->Clock();
+
 }
+	
 
 void View::Press( int x, int y)
 {
@@ -68,7 +116,7 @@ void View::Press( int x, int y)
 	//viewpoint.z = (float)x / 100.0;
 	//viewpoint.y = (float)y/100.0;
 
-	if( y <200)
+	if( y <MID_DISPLAY_Y)
 	{
 	viewpoint.x += 1.0;
 	screenpoint.x += 1.0;
@@ -106,9 +154,9 @@ bool View::MapPoint( Point p, int *x_out, int *y_out )
 
         Line2d screen;  // the display screen
         a.x = screenpoint.x;
-        a.y = screenpoint.z + 2.0;
+        a.y = screenpoint.z + SCREEN_X;
         b.x = screenpoint.x;
-        b.y = screenpoint.z - 2.0;
+        b.y = screenpoint.z - SCREEN_Y;
         screen.Set( a,b );
 
         //printf("Line of sight:\n");
@@ -142,9 +190,9 @@ bool View::MapPoint( Point p, int *x_out, int *y_out )
         los.Set( a, b );
 
         a.x = screenpoint.x;
-        a.y = screenpoint.y + 2.0;
+        a.y = screenpoint.y + SCREEN_X;
         b.x = screenpoint.x;
-        b.y = screenpoint.y - 2.0;
+        b.y = screenpoint.y - SCREEN_Y;
 
         screen.Set( a,b );
 
@@ -167,12 +215,12 @@ bool View::MapPoint( Point p, int *x_out, int *y_out )
         //printf("screen_y =%f\n", screen_y);
         int x = (int) (screen_x * 100.0 );
         // x is now +-200 and backwards
-        x = x+200;
-        x = 400-x;
+        x = x+MID_DISPLAY_X;
+        x = DISPLAY_X-x;
 
         int y = (int) (screen_y * 100.0);
-        y = y +200;
-        y = 400 -y;
+        y = y +MID_DISPLAY_Y;
+        y = DISPLAY_Y -y;
 
 	*x_out = x;
 	*y_out = y;
@@ -203,9 +251,9 @@ void View::DrawPoint( Point &p )
 
 	Line2d screen;  // the display screen
 	a.x = screenpoint.x;
-	a.y = screenpoint.z + 2.0;
+	a.y = screenpoint.z + SCREEN_X;
 	b.x = screenpoint.x;
-	b.y = screenpoint.z - 2.0;
+	b.y = screenpoint.z - SCREEN_Y;
 	screen.Set( a,b );
 
 	//printf("Line of sight:\n");		
@@ -240,9 +288,9 @@ void View::DrawPoint( Point &p )
 	los.Set( a, b );
 
 	a.x = screenpoint.x;
-	a.y = screenpoint.y + 2.0;
+	a.y = screenpoint.y + SCREEN_X;
 	b.x = screenpoint.x;
-	b.y = screenpoint.y - 2.0; 
+	b.y = screenpoint.y - SCREEN_Y; 
 
 	screen.Set( a,b );
 
@@ -265,19 +313,19 @@ void View::DrawPoint( Point &p )
 	//printf("screen_y =%f\n", screen_y);
 	int x = (int) (screen_x * 100.0 );
 	// x is now +-200 and backwards
-	x = x+200;
-	x = 400-x;
+	x = x+MID_DISPLAY_X;
+	x = DISPLAY_X-x;
 
 	int y = (int) (screen_y * 100.0);
-	y = y +200;
-	y = 400 -y;
+	y = y + MID_DISPLAY_Y;
+	y = DISPLAY_Y -y;
 */
 	int x;
 	int y;
 
 	MapPoint( p, &x, &y);
 
-	SetColour("linen");	
+	SetColour(white_colour);	
 	GWindow::DrawLine( x,y,x,y );
 
 	// record where it was rendered
@@ -317,11 +365,11 @@ void View::DrawTriangle( Point &a, Point &b, Point &c,bool highlight )
 
 	if( highlight )
 	{
-		GWindow::SetColour("red");
+		GWindow::SetColour(highlight_colour);
 	}
 	else
 	{
-		GWindow::SetColour("white");
+		GWindow::SetColour(white_colour);
 	}
 
 	GWindow::DrawLine( x1,y1,x2,y2);
@@ -356,11 +404,11 @@ void View::DrawLine( Point &a, Point &b, bool highlight )
 
 	if( highlight )
 	{
-		GWindow::SetColour("red");
+		GWindow::SetColour(highlight_colour);
 	}
 	else
 	{
-		GWindow::SetColour("white");
+		GWindow::SetColour(white_colour);
 	}
 
 	GWindow::DrawLine( x1,y1,x2,y2);
@@ -369,7 +417,7 @@ void View::DrawLine( Point &a, Point &b, bool highlight )
 
 void View::Draw()
 {
-	ClearWindow();
+	if( view != 2 )ClearWindow();
 	int i;
 	
 	for( i = 0 ; i < NUM_OBJECTS; i++)
