@@ -16,6 +16,8 @@
 
 View::View( Model *a_model )
 {
+	screen_offset_x = 0;
+	screen_offset_y = 0;
 	viewpoint.x = -10.0;
 	viewpoint.y = 1.0;
 	viewpoint.z = 2.0;
@@ -24,11 +26,19 @@ View::View( Model *a_model )
 	screenpoint.y = 1.0;
 	screenpoint.z = 2.0;
 
-	view = 0;
+	view = 1;
 	SetWhiteColour();
 
 	model = a_model;
 }
+
+void View::SetScreenOffset( int x, int y)
+{
+	printf("View::SetScreenOffset: x=%d\n", x);
+	screen_offset_x = x;
+	screen_offset_y = y;
+}
+
 void View::SetWhiteColour()
 {
 	switch (view)
@@ -52,29 +62,38 @@ void View::Key( int key )
 	switch (key)
 	{
 		case 'j':
-		viewpoint.x -= 1.0;
-		screenpoint.x -= 1.0;
+		viewpoint.x -= 10.0;
+		screenpoint.x -= 10.0;
 		break;
 		case 'k':
-		viewpoint.x += 1.0;
-		screenpoint.x += 1.0;
+		viewpoint.x += 10.0;
+		screenpoint.x += 10.0;
 		break;
 		case 'h':
-		viewpoint.z += 1.0;
-		screenpoint.z += 1.0;
+		viewpoint.z += 10.0;
+		screenpoint.z += 10.0;
 		break;
 		case ',':
-		viewpoint.y -= 1.0;
-		screenpoint.y -= 1.0;
+		viewpoint.y -= 10.0;
+		screenpoint.y -= 10.0;
 		break;
 		case 'u':
-		viewpoint.y += 1.0;
-		screenpoint.y += 1.0;
+		viewpoint.y += 10.0;
+		screenpoint.y += 10.0;
 		break;
 		case 'l':
-		viewpoint.z -= 1.0;
-		screenpoint.z -= 1.0;
+		viewpoint.z -= 10.0;
+		screenpoint.z -= 10.0;
 		break;
+
+
+		case 'z':
+		viewpoint.z -= 1.0;
+		break;
+		case 'x':
+		viewpoint.z += 1.0;
+		break;
+
 
 		default:
 			model->Press( key );
@@ -83,6 +102,14 @@ void View::Key( int key )
 
 void View::Tick()
 {
+	double f_xoff = (double)screen_offset_x / 50.0;
+	double f_yoff = (double)screen_offset_y / 50.0;
+	viewpoint.z += f_xoff;
+	screenpoint.z += f_xoff;
+
+	viewpoint.y += f_yoff;
+	screenpoint.y += f_yoff;
+
 	float eye_amount = 0.20;
 	//viewpoint.x -= 0.01;
 	//screenpoint.x -= 0.01;
@@ -106,6 +133,11 @@ void View::Tick()
 	}
 	model->Clock();
 
+	// put it back
+	viewpoint.z -= f_xoff;
+	screenpoint.z -= f_xoff;
+	viewpoint.y -= f_yoff;
+	screenpoint.y -= f_yoff;
 }
 	
 

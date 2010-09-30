@@ -21,7 +21,12 @@ class View : public GWindow
 	char highlight_colour[1024];
 	Model *model;
 
+	void SetScreenOffset( int x, int y );
+
 	private:
+	int screen_offset_x;
+	int screen_offset_y;
+
 	void SetWhiteColour();
 	void DrawPoint( Point &p );
 	void DrawLine( Point &a, Point &b, bool highlight = false );

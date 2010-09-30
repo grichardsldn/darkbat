@@ -23,16 +23,31 @@ int readInt( char *bp, char **bpp )
 }
 
 	Model model;
+	View *viewptr;
 
 void recv_pkt( char *bp, int from_id, unsigned int address, unsigned short port)
 {
 	int magic;
-
-	if( readInt( bp, &bp) != DKB_1_MAGIC )
+	
+	int header = readInt( bp, &bp );
+	
+	if( header != DKB_1_MAGIC )
 	{
-		printf("Bad magic number\n");
-		exit(10);
-		return;
+		if( header == DKB_VIEWPOINT_1_MAGIC )
+		{
+			printf("DKB VIEW\n");
+			int x = readInt( bp, &bp );
+			int y = readInt( bp, &bp );
+			printf("GDR: x=%d\n", x );		
+			viewptr->SetScreenOffset( x, y );
+			return;
+		}
+		else
+		{	
+			printf("Bad magic number\n");
+			exit(10);
+			return;
+		}
 	}
 
 	if( readInt( bp, &bp ) != DKB_CONNECTION_REF )
@@ -178,6 +193,7 @@ void *recv_thread( void *arg )
 int main(int argc, char **argv)
 {
 	View view( &model);
+	viewptr = &view;
 
 	Point a;
 

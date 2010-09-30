@@ -1,4 +1,5 @@
 #define DKB_1_MAGIC (26)
+#define DKB_VIEWPOINT_1_MAGIC (65)
 
 #define DKB_REF (0)
 #define DKB_CONNECTION_REF (4)
