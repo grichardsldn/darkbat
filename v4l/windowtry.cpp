@@ -33,15 +33,15 @@ void myWindow::Draw()
 	//DrawLine( 0,i+1, 500, i+1 );
 	}*/
 		int ret;	
-		char buffer[1000000];
+		unsigned char buffer[1000000];
 		memset( &buffer[0], 0xcc, 100000);
 		ret = read( dev, &buffer[0], 1000000);
-		//printf("read return #%d\n", ret );
+		printf("read return #%d\n", ret );
 	int x = 0;
 	int y = 0;
 	for( int i = 0; i < 230000 ; i+=3 )
 	{
-		if( buffer[i] > 30 )
+		if( buffer[i] > 50 )
 		{
 			DrawLine( x,y,x,y );
 		}
