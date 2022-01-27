@@ -1,9 +1,13 @@
 # darkbat
-wireframe display adapter for global application desktop
+
+display adapter for global application desktop
 
 ## architecture
 
 ![architecture](darkbat-excalidraw.svg)
 
-# whats actaully implemented here
+# what's actaully implemented here
+
+There's an error on this, the RTP streams are just UDP.
+
 ![implemeneted here](darkbat-excalidraw-implemented.svg)
