@@ -9,3 +9,7 @@ display adapter for global application desktop
 # what's actaully implemented here
 
 ![implemeneted here](darkbat-excalidraw-implemented.svg)
+
+# Example application code
+
+Not a great example, but see api/dkbtest.cpp
