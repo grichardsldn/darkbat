@@ -12,4 +12,6 @@ display adapter for global application desktop
 
 # Example application code
 
-Not a great example, but see api/dkbtest.cpp
+Not a great example, but see api/dkbtest.cpp.
+
+This projects a row of simple volume slider controls that can be interacted with.
