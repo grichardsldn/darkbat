@@ -14,7 +14,7 @@ display adapter for global application desktop
 # compiling for mac
 
 - install xquartz
-- create a symbolic link from /usr/local/include/X11 to /opt/X11/include/X11
+- (I had to) create a symbolic link from /usr/local/include/X11 to /opt/X11/include/X11
 
 # Viewer
 
