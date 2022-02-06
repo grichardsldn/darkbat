@@ -37,6 +37,9 @@ $ ./view
 Clicking on something clickable highlights it, keypresses that are not the viewer keys are sent to the
 client application that owns the highlighted item.
 
+There's a #define STEREOSCOPIC in viewer/viewcpp, setting that to 1 will give red/green 3d, though it
+just stamps the green over the red, so it's a bit cranky.
+
 # demo client
 
 These are a ui for a bank of volume control sliders.  They project to an adjustable position, a bit
