@@ -14,6 +14,8 @@
 #define SCREEN_X (2.0)
 #define SCREEN_Y (2.0)
 
+// #define STEREOSCOPIC (1)
+
 View::View( Model *a_model )
 {
 	screen_offset_x = 0;
@@ -26,7 +28,12 @@ View::View( Model *a_model )
 	screenpoint.y = 1.0;
 	screenpoint.z = 2.0;
 
+#ifdef STEREOSCOPIC
 	view = 1;
+#else
+	view = 0;
+#endif
+
 	SetWhiteColour();
 
 	model = a_model;
@@ -48,11 +55,11 @@ void View::SetWhiteColour()
 			strcpy( highlight_colour, "green");
 		break;
 		case 1: 
-			strcpy( white_colour, "cyan");
+			strcpy( white_colour, "magenta");
 			strcpy( highlight_colour, "green");
 		break;
 		case 2: 
-			strcpy( white_colour, "red");
+			strcpy( white_colour, "green");
 			strcpy( highlight_colour, "black");
 		break;
 	}
@@ -94,6 +101,13 @@ void View::Key( int key )
 		viewpoint.z += 1.0;
 		break;
 
+		case '-':
+		screenpoint.x += 1.0;
+		break;
+
+		case '=':
+		screenpoint.x -= 1.0;
+		break;
 
 		default:
 			model->Press( key );
@@ -114,8 +128,7 @@ void View::Tick()
 	//viewpoint.x -= 0.01;
 	//screenpoint.x -= 0.01;
 	if( view > 0 )
-	{
-	
+	{	
 	view = 1;
 	SetWhiteColour();
 	Draw();

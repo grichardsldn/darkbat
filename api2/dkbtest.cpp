@@ -125,10 +125,12 @@ void Vol::ReceiveClick( int clickref, int key )
 	ReDraw();
 }
 
-int main()
+int main(int argc, char**argv)
 {
-	VolPanel(-50,-20,5);
-	VolPanel(-10,0,0);
-	VolPanel(30,30,30);
-	sleep(30);
+	int pos = -50;
+	if (argc > 1) {
+		sscanf(argv[1], "%d", &pos);
+	}
+	VolPanel(2,-5,pos);
+	sleep(60);
 }

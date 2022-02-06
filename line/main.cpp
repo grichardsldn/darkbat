@@ -72,7 +72,7 @@ void recv_pkt( char *bp, int from_id, unsigned int address, unsigned short port)
 	do
 	{
 		type = readInt( bp, &bp);
-	
+printf("type=%i\n", type);	
 		switch(type )
 		{
 		case DKB_REF:
@@ -113,8 +113,8 @@ void recv_pkt( char *bp, int from_id, unsigned int address, unsigned short port)
 			col = readInt( bp, &bp );
 			clickref= readInt( bp, &bp);
 
-			//printf("GDR: AddTri %d %d %d %d %d %d %d %d %d\n",
-		//		x1,y1,z1,x2,y2,z2,x3,y3,z3);	
+			printf("GDR: AddTri %d %d %d %d %d %d %d %d %d\n",
+				x1,y1,z1,x2,y2,z2,x3,y3,z3);	
 			model.AddClickTri( (float)(x1 + pos_x),
 				(float)( y1 + pos_y),
 				(float)( z1 + pos_z),
@@ -144,8 +144,8 @@ void recv_pkt( char *bp, int from_id, unsigned int address, unsigned short port)
 			z2 = readInt( bp, &bp);	
 			col = readInt( bp, &bp );
 
-			//printf("GDR: AddLine %d %d %d %d %d %d\n",
-		//		x1,y1,z1,x2,y2,z2);	
+			printf("GDR: AddLine %d %d %d %d %d %d\n",
+				x1,y1,z1,x2,y2,z2);	
 			model.AddLine( (float)(x1 + pos_x),
 				(float)( y1 + pos_y),
 				(float)( z1 + pos_z),
@@ -188,7 +188,12 @@ void *recv_thread( void *arg )
 	}
 	
 }
-
+void arrow(float x, float y, float z, Model *model, float lifespan ) {
+	model->AddLine( 8 + x,y,z, x,y,z, 1,0,lifespan);
+	model->AddLine( x,y,z, x+2,y,z - 1, 1,0,lifespan);
+	model->AddLine( x,y,z, x+2,y,z + 1, 1,0,lifespan);
+}
+	
 
 int main(int argc, char **argv)
 {
@@ -197,19 +202,11 @@ int main(int argc, char **argv)
 
 	Point a;
 
-	//model.AddPoint( 5.0, 0.0, 1.0, 0);
-	//model.AddPoint( 6.0, 0.0, 1.0, 0);
-
-	model.AddLine( 5.0, 0.0, 1.0, 6.0, 0.0, 1.0, 1,0, 200);
-
-	model.AddPoint( 6.0, 0.0, 2.0, 0,0, 200);
-	model.AddPoint( 7.0, 0.0, 2.0, 0,0, 200);
-	model.AddPoint( 7.0, 1.0, 2.0, 0,0, 200);
-	model.AddPoint( 5.0, 0.0, -0.5, 0,0, 200);
-	model.AddPoint( 7.0, 1.0, 2.2, 0,0, 200);
-	model.AddPoint( 7.0, 1.0, 2.4, 0,0, 200);
-	model.AddPoint( 7.0, 1.0, 2.6, 0,0, 200);
-
+	// add some objects
+	for( float x = 0; x < 5 ; x++) {
+		arrow(  55 - (x * 55), -8, 0, &model, 300 + x * 2);
+	}	
+ 
 	int oa = 0;
 	int ob = 0;
 	// add random dots on the floor
@@ -219,7 +216,7 @@ int main(int argc, char **argv)
 		int b = (random() % 400) - 200;
 		int c = (random() % 3);
 		model.AddPoint( (float)a, -5.0 + c, (float)b, 1,0, 30000);
-		//model.AddLine( (float)a, -5.0, (float)b, (float)oa, -5.0, (float)ob, 1 );
+		// model.AddLine( (float)a, -5.0, (float)b, (float)oa, -5.0, (float)ob, 1 );
 		oa = a; 
 		ob = b;
 	}
