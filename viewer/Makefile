@@ -1,7 +1,7 @@
-all: main
+all: view 
 
 clean:
-	rm main *.o
+	rm view *.o
 CC=g++
 
 source.o: Makefile source.cpp
@@ -25,7 +25,7 @@ window.o: Makefile window.cpp
 view.o: Makefile view.cpp
 	${CC} -c view.cpp
 
-main: Makefile main.o line.o model.o window.o view.o UDPSocket.o source.o
-	${CC} -o main main.o line.o model.o window.o UDPSocket.o view.o source.o -lm -lpthread -L/usr/X11R6/lib -lX11
+view: Makefile main.o line.o model.o window.o view.o UDPSocket.o source.o
+	${CC} -o view main.o line.o model.o window.o UDPSocket.o view.o source.o -lm -lpthread -L/usr/X11R6/lib -lX11
 
 

@@ -2,6 +2,7 @@
 
 display adapter for global application desktop
 
+
 ## architecture
 
 ![architecture](darkbat-excalidraw.svg)
@@ -10,8 +11,26 @@ display adapter for global application desktop
 
 ![implemeneted here](darkbat-excalidraw-implemented.svg)
 
-# Example application code
+# compiling for mac
 
-Not a great example, but see api/dkbtest.cpp.
+- install xquartz
+- create a symbolic link from /usr/local/include/X11 to /opt/X11/include/X11
 
-This projects a row of simple volume slider controls that can be interacted with.
+# Viewer
+
+```
+$ cd viewer
+$ make
+$ ./view
+```
+
+Keys:
+- h left
+- j back
+- k forward
+- l right
+- u up
+- , down
+- \- zoom out
+- \= zoom in
+
